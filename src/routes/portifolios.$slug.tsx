@@ -13,10 +13,14 @@ import type { PortfolioSection } from "@/data/models";
 import { getMediaForView } from "@/lib/portfolio-media.functions";
 
 export const Route = createFileRoute("/portifolios/$slug")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    preview: search.preview === "1" || search.preview === 1 || search.preview === true,
-    t: typeof search.t === "string" ? search.t : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const preview = search.preview === "1" || search.preview === 1 || search.preview === true;
+    const t = typeof search.t === "string" ? search.t : undefined;
+    return {
+      ...(preview ? { preview: true as const } : {}),
+      ...(t ? { t } : {}),
+    };
+  },
   loader: ({ params }) => {
     const model = findModel(params.slug);
     if (!model) throw notFound();
