@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortifoliosRouteImport } from './routes/portifolios'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortifoliosIndexRouteImport } from './routes/portifolios.index'
 import { Route as PortifoliosSlugRouteImport } from './routes/portifolios.$slug'
 
 const PortifoliosRoute = PortifoliosRouteImport.update({
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortifoliosIndexRoute = PortifoliosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortifoliosRoute,
+} as any)
 const PortifoliosSlugRoute = PortifoliosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -33,24 +39,26 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios/': typeof PortifoliosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/portifolios': typeof PortifoliosRouteWithChildren
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios': typeof PortifoliosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios/': typeof PortifoliosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/portifolios' | '/portifolios/$slug'
+  fullPaths: '/' | '/portifolios' | '/portifolios/$slug' | '/portifolios/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/portifolios' | '/portifolios/$slug'
-  id: '__root__' | '/' | '/portifolios' | '/portifolios/$slug'
+  to: '/' | '/portifolios/$slug' | '/portifolios'
+  id: '__root__' | '/' | '/portifolios' | '/portifolios/$slug' | '/portifolios/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -74,6 +82,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portifolios/': {
+      id: '/portifolios/'
+      path: '/'
+      fullPath: '/portifolios/'
+      preLoaderRoute: typeof PortifoliosIndexRouteImport
+      parentRoute: typeof PortifoliosRoute
+    }
     '/portifolios/$slug': {
       id: '/portifolios/$slug'
       path: '/$slug'
@@ -86,10 +101,12 @@ declare module '@tanstack/react-router' {
 
 interface PortifoliosRouteChildren {
   PortifoliosSlugRoute: typeof PortifoliosSlugRoute
+  PortifoliosIndexRoute: typeof PortifoliosIndexRoute
 }
 
 const PortifoliosRouteChildren: PortifoliosRouteChildren = {
   PortifoliosSlugRoute: PortifoliosSlugRoute,
+  PortifoliosIndexRoute: PortifoliosIndexRoute,
 }
 
 const PortifoliosRouteWithChildren = PortifoliosRoute._addFileChildren(
@@ -103,3 +120,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
