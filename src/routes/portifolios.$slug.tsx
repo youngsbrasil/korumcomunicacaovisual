@@ -2,6 +2,7 @@ import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-rout
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { FileDown, Mail, MessageCircle, Phone, Share2 } from "lucide-react";
+import { useState } from "react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
@@ -11,6 +12,8 @@ import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
 import type { PortfolioSection } from "@/data/models";
 import { getMediaForView } from "@/lib/portfolio-media.functions";
+
+const SITE_URL = "https://korumcomunicacaovisual.com.br";
 
 export const Route = createFileRoute("/portifolios/$slug")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -26,19 +29,61 @@ export const Route = createFileRoute("/portifolios/$slug")({
     if (!model) throw notFound();
     return { model };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData?.model.seo.title ?? "Portfólio não encontrado — Korum" },
-      { name: "description", content: loaderData?.model.seo.description ?? "Portfólio Korum indisponível." },
-      { property: "og:title", content: loaderData?.model.seo.title ?? "Portfólio não encontrado — Korum" },
-      { property: "og:description", content: loaderData?.model.seo.description ?? "Portfólio Korum indisponível." },
-      ...(!loaderData ? [{ name: "robots", content: "noindex" }] : []),
-    ],
-  }),
+  head: ({ params, loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: "Portfólio não encontrado — Korum" },
+          { name: "description", content: "Portfólio Korum indisponível." },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const { model } = loaderData;
+    const pageUrl = `${SITE_URL}/portifolios/${params.slug}`;
+    return {
+      meta: [
+        { title: model.seo.title },
+        { name: "description", content: model.seo.description },
+        { name: "theme-color", content: "#182338" },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "Korum Comunicação Visual" },
+        { property: "og:title", content: model.seo.title },
+        { property: "og:description", content: model.seo.description },
+        { property: "og:url", content: pageUrl },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: model.seo.title },
+        { name: "twitter:description", content: model.seo.description },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: model.name,
+            description: model.seo.description,
+            areaServed: "BR",
+            url: pageUrl,
+            provider: {
+              "@type": "Organization",
+              name: "Korum Comunicação Visual",
+              telephone: "+5511917748504",
+              email: "comercial2@korumcomunicacaovisual.com.br",
+              url: SITE_URL,
+            },
+          }),
+        },
+      ],
+    };
+  },
   notFoundComponent: PortfolioNotFound,
   errorComponent: PortfolioError,
   component: PortfolioModelPage,
 });
+
 
 type MediaItem = {
   id: string;
