@@ -7,6 +7,7 @@ import { KorumLogo } from "@/components/brand/KorumLogo";
 import { LedTexture } from "@/components/brand/LedTexture";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
+import type { PortfolioSection } from "@/data/models";
 
 export const Route = createFileRoute("/portifolios/$slug")({
   loader: ({ params }) => {
@@ -91,14 +92,14 @@ function PortfolioModelPage() {
 
       <section className="flex-1 bg-korum-paper text-korum-navy">
         <div className="mx-auto flex max-w-5xl flex-col gap-16 px-6 py-14 md:gap-24 md:px-12 md:py-24">
-          {model.sections.map((section, index) => {
+          {model.sections.map((section: PortfolioSection, index: number) => {
             const number = String(index + 1).padStart(2, "0");
             return (
               <article key={section.id} id={section.id} className="scroll-mt-24">
                 <EyebrowTag>{number} · {section.eyebrow}</EyebrowTag>
                 <h2 className="font-brand-heavy mt-3 leading-tight tracking-normal text-korum-navy" style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)" }}>{section.title}</h2>
                 <div className="mt-6 max-w-3xl space-y-4 text-base leading-relaxed text-korum-paper-muted md:text-lg">
-                  {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  {section.body.map((paragraph: string) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
 
                 <div className="mt-8 flex items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-16 text-center text-korum-navy/55 md:py-24">
@@ -107,7 +108,7 @@ function PortfolioModelPage() {
 
                 {section.chips.length > 0 && (
                   <div className="mt-8 flex flex-wrap gap-2 md:gap-3">
-                    {section.chips.map((chip, chipIndex) => (
+                    {section.chips.map((chip: string, chipIndex: number) => (
                       <span key={chip} className={chipIndex === 0 ? "inline-flex items-center rounded-full bg-korum-navy px-4 py-2 text-sm font-medium text-korum-paper" : "inline-flex items-center rounded-full border border-korum-navy/30 px-4 py-2 text-sm font-medium text-korum-navy"}>
                         {chip}
                       </span>

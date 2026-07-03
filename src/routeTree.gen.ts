@@ -9,38 +9,64 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PortifoliosRouteImport } from './routes/portifolios'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortifoliosSlugRouteImport } from './routes/portifolios.$slug'
 
+const PortifoliosRoute = PortifoliosRouteImport.update({
+  id: '/portifolios',
+  path: '/portifolios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortifoliosSlugRoute = PortifoliosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => PortifoliosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/portifolios': typeof PortifoliosRouteWithChildren
+  '/portifolios/$slug': typeof PortifoliosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/portifolios': typeof PortifoliosRouteWithChildren
+  '/portifolios/$slug': typeof PortifoliosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/portifolios': typeof PortifoliosRouteWithChildren
+  '/portifolios/$slug': typeof PortifoliosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/portifolios' | '/portifolios/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/portifolios' | '/portifolios/$slug'
+  id: '__root__' | '/' | '/portifolios' | '/portifolios/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PortifoliosRoute: typeof PortifoliosRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/portifolios': {
+      id: '/portifolios'
+      path: '/portifolios'
+      fullPath: '/portifolios'
+      preLoaderRoute: typeof PortifoliosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +74,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portifolios/$slug': {
+      id: '/portifolios/$slug'
+      path: '/$slug'
+      fullPath: '/portifolios/$slug'
+      preLoaderRoute: typeof PortifoliosSlugRouteImport
+      parentRoute: typeof PortifoliosRoute
+    }
   }
 }
 
+interface PortifoliosRouteChildren {
+  PortifoliosSlugRoute: typeof PortifoliosSlugRoute
+}
+
+const PortifoliosRouteChildren: PortifoliosRouteChildren = {
+  PortifoliosSlugRoute: PortifoliosSlugRoute,
+}
+
+const PortifoliosRouteWithChildren = PortifoliosRoute._addFileChildren(
+  PortifoliosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PortifoliosRoute: PortifoliosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
