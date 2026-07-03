@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Korum" },
+      { name: "twitter:title", content: "Korum Comunicação Visual" },
+      { name: "twitter:description", content: "Comunicação visual, painéis de LED, fachadas e sinalização para marcas que precisam aparecer." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/9da778ca-820d-4e9d-afd2-903189960c3a" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/9da778ca-820d-4e9d-afd2-903189960c3a" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
