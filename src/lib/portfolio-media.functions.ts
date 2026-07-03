@@ -15,13 +15,17 @@ function verifyAdmin(token: string | undefined | null): boolean {
 
 const SIGNED_URL_TTL = 60 * 60; // 1 hour
 
+function isAbsoluteUrl(u: string) {
+  return /^https?:\/\//i.test(u) || u.startsWith("/__l5e/") || u.startsWith("/");
+}
+
 async function signUrls<T extends { kind: string; url: string }>(
   rows: T[],
 ): Promise<(T & { signedUrl: string })[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return Promise.all(
     rows.map(async (row) => {
-      if (row.kind === "videolink") {
+      if (row.kind === "videolink" || isAbsoluteUrl(row.url)) {
         return { ...row, signedUrl: row.url };
       }
       const { data } = await supabaseAdmin.storage
