@@ -174,7 +174,7 @@ export const adminUpdateMedia = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
-    const patch: Record<string, unknown> = {};
+    const patch: { caption?: string; alt?: string; ordem?: number } = {};
     if (data.caption !== undefined) patch.caption = data.caption;
     if (data.alt !== undefined) patch.alt = data.alt;
     if (data.ordem !== undefined) patch.ordem = data.ordem;
