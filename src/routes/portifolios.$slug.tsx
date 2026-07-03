@@ -176,6 +176,12 @@ function PortfolioModelPage() {
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+  const pageUrl = `${SITE_URL}/portifolios/${model.slug}`;
+  const shareText = `${model.seo.title} ${pageUrl}`;
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(model.seo.title)}&body=${encodeURIComponent(pageUrl)}`;
+
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const fetchMedia = useServerFn(getMediaForView);
   const { data: media = [] } = useQuery({
@@ -191,8 +197,86 @@ function PortfolioModelPage() {
   const mediaBySection = (id: string) =>
     media.filter((m) => m.section_id === id).sort((a, b) => 0); // already ordered by server
 
+  const handleGeneratePdf = async () => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      const shell = document.querySelector<HTMLElement>(".shell");
+      if (!shell) throw new Error("shell not found");
+
+      const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
+      const prevDisplay = floating?.style.display ?? "";
+      if (floating) floating.style.display = "none";
+
+      // Wait for images
+      const imgs = Array.from(shell.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete) return resolve();
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }),
+        ),
+      );
+
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+
+      const canvas = await html2canvas(shell, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#182338",
+        windowWidth: 540,
+        width: 540,
+        logging: false,
+      });
+
+      if (floating) floating.style.display = prevDisplay;
+
+      const pdfWidthMM = 540 * 25.4 / 96; // ~142.9mm
+      const pageHeightPxCss = 540 * 1.9; // 1026px in CSS pixels
+      const pageHeightPx = pageHeightPxCss * 2; // account for scale:2
+      const pdfPageHeightMM = pageHeightPxCss * 25.4 / 96;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [pdfWidthMM, pdfPageHeightMM],
+      });
+
+      const totalHeight = canvas.height;
+      const totalPages = Math.ceil(totalHeight / pageHeightPx);
+
+      for (let i = 0; i < totalPages; i++) {
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = pageHeightPx;
+        const ctx = sliceCanvas.getContext("2d")!;
+        ctx.fillStyle = "#182338";
+        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        ctx.drawImage(canvas, 0, -i * pageHeightPx);
+
+        const imgData = sliceCanvas.toDataURL("image/jpeg", 0.94);
+        if (i > 0) pdf.addPage([pdfWidthMM, pdfPageHeightMM], "portrait");
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfPageHeightMM, "", "NONE");
+      }
+
+      pdf.save(`Korum-${model.slug}.pdf`);
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível gerar o PDF neste navegador. Tente pelo Google Chrome.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen flex-col text-korum-navy">
+    <div className="shell flex min-h-screen flex-col text-korum-navy">
+
       <TopBlocks />
 
       <section className="relative overflow-hidden bg-korum-navy text-korum-paper">
