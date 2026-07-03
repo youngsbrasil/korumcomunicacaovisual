@@ -372,19 +372,33 @@ function PortfolioModelPage() {
           <h2 className="font-brand-heavy mt-3 leading-tight tracking-normal" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>Gostou? Leve com você</h2>
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
-              <FileDown className="h-5 w-5" /> Salvar em PDF
+            <button
+              type="button"
+              onClick={handleGeneratePdf}
+              disabled={pdfLoading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-5 py-4 font-bold text-korum-paper transition-opacity hover:opacity-90 disabled:opacity-70"
+            >
+              <FileDown className="h-5 w-5" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
             </button>
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
+            <a
+              href={mailtoUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper transition-colors hover:bg-korum-paper/20"
+            >
               <Mail className="h-5 w-5" /> Enviar por e-mail
-            </button>
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
+            </a>
+            <a
+              href={waShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper transition-colors hover:bg-korum-paper/20"
+            >
               <Share2 className="h-5 w-5" /> Compartilhar link no WhatsApp
-            </button>
+            </a>
             <a href={waUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-5 py-4 font-bold text-korum-paper transition-opacity hover:opacity-90">
               <Phone className="h-5 w-5" /> Entrar em contato agora
             </a>
           </div>
+
         </div>
       </section>
 
