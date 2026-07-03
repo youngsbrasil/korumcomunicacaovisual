@@ -123,9 +123,24 @@ function parseSubtitle(text: string) {
 
 function PortfolioModelPage() {
   const { model } = Route.useLoaderData();
+  const search = useSearch({ from: "/portifolios/$slug" });
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+
+  const fetchMedia = useServerFn(getMediaForView);
+  const { data: media = [] } = useQuery({
+    queryKey: ["portfolio-media", model.slug, search.preview, search.t ?? ""],
+    queryFn: () =>
+      fetchMedia({
+        data: { slug: model.slug, preview: search.preview, token: search.t },
+      }) as Promise<MediaItem[]>,
+    staleTime: 30_000,
+  });
+
+  const hero = media.find((m) => m.section_id === "__hero");
+  const mediaBySection = (id: string) =>
+    media.filter((m) => m.section_id === id).sort((a, b) => 0); // already ordered by server
 
   return (
     <div className="flex min-h-screen flex-col text-korum-navy">
@@ -144,12 +159,18 @@ function PortfolioModelPage() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 py-10 md:gap-14 md:px-12 md:py-16 lg:grid-cols-2">
           <div className="relative">
             <div className="relative overflow-hidden rounded-3xl border-4" style={{ borderColor: model.accent, aspectRatio: "4 / 3" }}>
-              <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-brand-heavy select-none text-korum-paper" style={{ fontSize: "clamp(4rem, 14vw, 10rem)", textShadow: `0 0 40px ${model.accent}` }}>
-                  {model.name.slice(0, 3).toUpperCase()}
-                </span>
-              </div>
+              {hero ? (
+                <MediaRenderer item={hero} />
+              ) : (
+                <>
+                  <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-brand-heavy select-none text-korum-paper" style={{ fontSize: "clamp(4rem, 14vw, 10rem)", textShadow: `0 0 40px ${model.accent}` }}>
+                      {model.name.slice(0, 3).toUpperCase()}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
