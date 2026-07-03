@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortifoliosRouteImport } from './routes/portifolios'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortifoliosIndexRouteImport } from './routes/portifolios.index'
+import { Route as PortifoliosAdminRouteImport } from './routes/portifolios.admin'
 import { Route as PortifoliosSlugRouteImport } from './routes/portifolios.$slug'
 
 const PortifoliosRoute = PortifoliosRouteImport.update({
@@ -29,6 +30,11 @@ const PortifoliosIndexRoute = PortifoliosIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PortifoliosRoute,
 } as any)
+const PortifoliosAdminRoute = PortifoliosAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => PortifoliosRoute,
+} as any)
 const PortifoliosSlugRoute = PortifoliosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -39,11 +45,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios/': typeof PortifoliosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios': typeof PortifoliosIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,26 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
   '/portifolios/$slug': typeof PortifoliosSlugRoute
+  '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios/': typeof PortifoliosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/portifolios' | '/portifolios/$slug' | '/portifolios/'
+  fullPaths:
+    | '/'
+    | '/portifolios'
+    | '/portifolios/$slug'
+    | '/portifolios/admin'
+    | '/portifolios/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/portifolios/$slug' | '/portifolios'
-  id: '__root__' | '/' | '/portifolios' | '/portifolios/$slug' | '/portifolios/'
+  to: '/' | '/portifolios/$slug' | '/portifolios/admin' | '/portifolios'
+  id:
+    | '__root__'
+    | '/'
+    | '/portifolios'
+    | '/portifolios/$slug'
+    | '/portifolios/admin'
+    | '/portifolios/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortifoliosIndexRouteImport
       parentRoute: typeof PortifoliosRoute
     }
+    '/portifolios/admin': {
+      id: '/portifolios/admin'
+      path: '/admin'
+      fullPath: '/portifolios/admin'
+      preLoaderRoute: typeof PortifoliosAdminRouteImport
+      parentRoute: typeof PortifoliosRoute
+    }
     '/portifolios/$slug': {
       id: '/portifolios/$slug'
       path: '/$slug'
@@ -101,11 +128,13 @@ declare module '@tanstack/react-router' {
 
 interface PortifoliosRouteChildren {
   PortifoliosSlugRoute: typeof PortifoliosSlugRoute
+  PortifoliosAdminRoute: typeof PortifoliosAdminRoute
   PortifoliosIndexRoute: typeof PortifoliosIndexRoute
 }
 
 const PortifoliosRouteChildren: PortifoliosRouteChildren = {
   PortifoliosSlugRoute: PortifoliosSlugRoute,
+  PortifoliosAdminRoute: PortifoliosAdminRoute,
   PortifoliosIndexRoute: PortifoliosIndexRoute,
 }
 
@@ -120,3 +149,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
