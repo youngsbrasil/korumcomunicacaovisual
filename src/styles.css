@@ -59,6 +59,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-korum-navy: var(--korum-navy);
+  --color-korum-navy-deep: var(--korum-navy-deep);
+  --color-korum-paper: var(--korum-paper);
+  --color-korum-paper-muted: var(--korum-paper-muted);
+  --color-korum-green: var(--korum-green);
+  --color-korum-green-dark: var(--korum-green-dark);
+  --color-korum-cyan: var(--korum-cyan);
+  --color-korum-orange: var(--korum-orange);
+  --color-korum-whatsapp: var(--korum-whatsapp);
 }
 
 :root {
@@ -95,6 +104,15 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --korum-navy: oklch(0.23 0.071 263.2);
+  --korum-navy-deep: oklch(0.18 0.065 263.4);
+  --korum-paper: oklch(0.96 0.015 84.6);
+  --korum-paper-muted: oklch(0.38 0.061 260.2);
+  --korum-green: oklch(0.78 0.211 148.1);
+  --korum-green-dark: oklch(0.68 0.17 146.7);
+  --korum-cyan: oklch(0.79 0.129 212.1);
+  --korum-orange: oklch(0.72 0.16 55.7);
+  --korum-whatsapp: oklch(0.75 0.178 151.8);
 }
 
 .dark {
@@ -130,6 +148,15 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  --korum-navy: oklch(0.23 0.071 263.2);
+  --korum-navy-deep: oklch(0.18 0.065 263.4);
+  --korum-paper: oklch(0.96 0.015 84.6);
+  --korum-paper-muted: oklch(0.38 0.061 260.2);
+  --korum-green: oklch(0.78 0.211 148.1);
+  --korum-green-dark: oklch(0.68 0.17 146.7);
+  --korum-cyan: oklch(0.79 0.129 212.1);
+  --korum-orange: oklch(0.72 0.16 55.7);
+  --korum-whatsapp: oklch(0.75 0.178 151.8);
 }
 
 @layer base {
@@ -140,5 +167,64 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Space Grotesk", sans-serif;
+  }
+}
+
+@utility font-display {
+  font-family: "Outfit", sans-serif;
+}
+
+@utility font-brand-heavy {
+  font-family: "Archivo Black", sans-serif;
+}
+
+@utility bg-grid-pattern {
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--korum-cyan) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--korum-cyan) 10%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@utility bg-gradient-hero {
+  background:
+    radial-gradient(circle at 15% 12%, color-mix(in oklch, var(--korum-orange) 16%, transparent), transparent 24rem),
+    radial-gradient(circle at 85% 78%, color-mix(in oklch, var(--korum-cyan) 14%, transparent), transparent 24rem),
+    linear-gradient(160deg, var(--korum-navy-deep) 0%, var(--korum-navy) 44%, oklch(0.2 0.061 248) 100%);
+}
+
+@utility text-gradient-korum {
+  background-image: linear-gradient(135deg, var(--korum-cyan), var(--korum-orange));
+  background-clip: text;
+  color: transparent;
+}
+
+@utility pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px -5px color-mix(in oklch, var(--korum-green) 55%, transparent),
+      0 0 40px -10px color-mix(in oklch, var(--korum-green) 34%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 35px -5px color-mix(in oklch, var(--korum-green) 72%, transparent),
+      0 0 70px -10px color-mix(in oklch, var(--korum-green) 45%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
