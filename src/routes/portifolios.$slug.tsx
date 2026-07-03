@@ -2,6 +2,7 @@ import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-rout
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { FileDown, Mail, MessageCircle, Phone, Share2 } from "lucide-react";
+import { useState } from "react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
@@ -11,6 +12,8 @@ import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
 import type { PortfolioSection } from "@/data/models";
 import { getMediaForView } from "@/lib/portfolio-media.functions";
+
+const SITE_URL = "https://korumcomunicacaovisual.com.br";
 
 export const Route = createFileRoute("/portifolios/$slug")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -26,19 +29,61 @@ export const Route = createFileRoute("/portifolios/$slug")({
     if (!model) throw notFound();
     return { model };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData?.model.seo.title ?? "Portfólio não encontrado — Korum" },
-      { name: "description", content: loaderData?.model.seo.description ?? "Portfólio Korum indisponível." },
-      { property: "og:title", content: loaderData?.model.seo.title ?? "Portfólio não encontrado — Korum" },
-      { property: "og:description", content: loaderData?.model.seo.description ?? "Portfólio Korum indisponível." },
-      ...(!loaderData ? [{ name: "robots", content: "noindex" }] : []),
-    ],
-  }),
+  head: ({ params, loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: "Portfólio não encontrado — Korum" },
+          { name: "description", content: "Portfólio Korum indisponível." },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const { model } = loaderData;
+    const pageUrl = `${SITE_URL}/portifolios/${params.slug}`;
+    return {
+      meta: [
+        { title: model.seo.title },
+        { name: "description", content: model.seo.description },
+        { name: "theme-color", content: "#182338" },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "Korum Comunicação Visual" },
+        { property: "og:title", content: model.seo.title },
+        { property: "og:description", content: model.seo.description },
+        { property: "og:url", content: pageUrl },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: model.seo.title },
+        { name: "twitter:description", content: model.seo.description },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: model.name,
+            description: model.seo.description,
+            areaServed: "BR",
+            url: pageUrl,
+            provider: {
+              "@type": "Organization",
+              name: "Korum Comunicação Visual",
+              telephone: "+5511917748504",
+              email: "comercial2@korumcomunicacaovisual.com.br",
+              url: SITE_URL,
+            },
+          }),
+        },
+      ],
+    };
+  },
   notFoundComponent: PortfolioNotFound,
   errorComponent: PortfolioError,
   component: PortfolioModelPage,
 });
+
 
 type MediaItem = {
   id: string;
@@ -131,6 +176,12 @@ function PortfolioModelPage() {
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+  const pageUrl = `${SITE_URL}/portifolios/${model.slug}`;
+  const shareText = `${model.seo.title} ${pageUrl}`;
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(model.seo.title)}&body=${encodeURIComponent(pageUrl)}`;
+
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const fetchMedia = useServerFn(getMediaForView);
   const { data: media = [] } = useQuery({
@@ -146,8 +197,86 @@ function PortfolioModelPage() {
   const mediaBySection = (id: string) =>
     media.filter((m) => m.section_id === id).sort((a, b) => 0); // already ordered by server
 
+  const handleGeneratePdf = async () => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      const shell = document.querySelector<HTMLElement>(".shell");
+      if (!shell) throw new Error("shell not found");
+
+      const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
+      const prevDisplay = floating?.style.display ?? "";
+      if (floating) floating.style.display = "none";
+
+      // Wait for images
+      const imgs = Array.from(shell.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete) return resolve();
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }),
+        ),
+      );
+
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+
+      const canvas = await html2canvas(shell, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#182338",
+        windowWidth: 540,
+        width: 540,
+        logging: false,
+      });
+
+      if (floating) floating.style.display = prevDisplay;
+
+      const pdfWidthMM = 540 * 25.4 / 96; // ~142.9mm
+      const pageHeightPxCss = 540 * 1.9; // 1026px in CSS pixels
+      const pageHeightPx = pageHeightPxCss * 2; // account for scale:2
+      const pdfPageHeightMM = pageHeightPxCss * 25.4 / 96;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [pdfWidthMM, pdfPageHeightMM],
+      });
+
+      const totalHeight = canvas.height;
+      const totalPages = Math.ceil(totalHeight / pageHeightPx);
+
+      for (let i = 0; i < totalPages; i++) {
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = pageHeightPx;
+        const ctx = sliceCanvas.getContext("2d")!;
+        ctx.fillStyle = "#182338";
+        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        ctx.drawImage(canvas, 0, -i * pageHeightPx);
+
+        const imgData = sliceCanvas.toDataURL("image/jpeg", 0.94);
+        if (i > 0) pdf.addPage([pdfWidthMM, pdfPageHeightMM], "portrait");
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfPageHeightMM, "", "NONE");
+      }
+
+      pdf.save(`Korum-${model.slug}.pdf`);
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível gerar o PDF neste navegador. Tente pelo Google Chrome.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen flex-col text-korum-navy">
+    <div className="shell flex min-h-screen flex-col text-korum-navy">
+
       <TopBlocks />
 
       <section className="relative overflow-hidden bg-korum-navy text-korum-paper">
@@ -243,19 +372,33 @@ function PortfolioModelPage() {
           <h2 className="font-brand-heavy mt-3 leading-tight tracking-normal" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>Gostou? Leve com você</h2>
 
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
-              <FileDown className="h-5 w-5" /> Salvar em PDF
+            <button
+              type="button"
+              onClick={handleGeneratePdf}
+              disabled={pdfLoading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-5 py-4 font-bold text-korum-paper transition-opacity hover:opacity-90 disabled:opacity-70"
+            >
+              <FileDown className="h-5 w-5" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
             </button>
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
+            <a
+              href={mailtoUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper transition-colors hover:bg-korum-paper/20"
+            >
               <Mail className="h-5 w-5" /> Enviar por e-mail
-            </button>
-            <button type="button" disabled className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper/90 transition-colors disabled:opacity-70">
+            </a>
+            <a
+              href={waShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-5 py-4 text-korum-paper transition-colors hover:bg-korum-paper/20"
+            >
               <Share2 className="h-5 w-5" /> Compartilhar link no WhatsApp
-            </button>
+            </a>
             <a href={waUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-5 py-4 font-bold text-korum-paper transition-opacity hover:opacity-90">
               <Phone className="h-5 w-5" /> Entrar em contato agora
             </a>
           </div>
+
         </div>
       </section>
 
