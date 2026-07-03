@@ -1,4 +1,6 @@
-import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { FileDown, Mail, MessageCircle, Phone, Share2 } from "lucide-react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
@@ -8,8 +10,17 @@ import { LedTexture } from "@/components/brand/LedTexture";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
 import type { PortfolioSection } from "@/data/models";
+import { getMediaForView } from "@/lib/portfolio-media.functions";
 
 export const Route = createFileRoute("/portifolios/$slug")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const preview = search.preview === "1" || search.preview === 1 || search.preview === true;
+    const t = typeof search.t === "string" ? search.t : undefined;
+    return {
+      ...(preview ? { preview: true as const } : {}),
+      ...(t ? { t } : {}),
+    };
+  },
   loader: ({ params }) => {
     const model = findModel(params.slug);
     if (!model) throw notFound();
@@ -29,6 +40,85 @@ export const Route = createFileRoute("/portifolios/$slug")({
   component: PortfolioModelPage,
 });
 
+type MediaItem = {
+  id: string;
+  section_id: string;
+  kind: string;
+  url: string;
+  caption: string | null;
+  signedUrl: string;
+};
+
+function youtubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  return m ? m[1] : null;
+}
+
+function MediaRenderer({ item }: { item: MediaItem }) {
+  if (item.kind === "image") {
+    return (
+      <img
+        src={item.signedUrl}
+        alt={item.caption ?? ""}
+        className="w-full h-full object-cover"
+        loading="lazy"
+      />
+    );
+  }
+  if (item.kind === "video") {
+    return (
+      <video src={item.signedUrl} controls playsInline className="w-full h-full object-cover" />
+    );
+  }
+  // videolink
+  const yt = youtubeId(item.url);
+  if (yt) {
+    return (
+      <iframe
+        src={`https://www.youtube.com/embed/${yt}`}
+        title={item.caption ?? "Vídeo"}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-full"
+      />
+    );
+  }
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex h-full w-full items-center justify-center bg-korum-navy text-korum-paper font-bold"
+    >
+      ▶ Assista ao vídeo
+    </a>
+  );
+}
+
+function Gallery({ items }: { items: MediaItem[] }) {
+  if (items.length === 0) return null;
+  const cols = items.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2";
+  return (
+    <div className={`mt-8 grid ${cols} gap-4`}>
+      {items.map((item) => (
+        <figure key={item.id} className="overflow-hidden rounded-2xl bg-black">
+          <div className="aspect-video">
+            <MediaRenderer item={item} />
+          </div>
+          {item.caption && (
+            <figcaption
+              className="px-4 py-2 text-sm text-korum-navy/70"
+              style={{ fontFamily: "Space Mono, monospace" }}
+            >
+              {item.caption}
+            </figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 function parseSubtitle(text: string) {
   const matches = text.match(/<([^>]+)>\s*<([^>]+)>/);
   if (!matches) return { first: text, second: "" };
@@ -37,9 +127,24 @@ function parseSubtitle(text: string) {
 
 function PortfolioModelPage() {
   const { model } = Route.useLoaderData();
+  const search = useSearch({ from: "/portifolios/$slug" });
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+
+  const fetchMedia = useServerFn(getMediaForView);
+  const { data: media = [] } = useQuery({
+    queryKey: ["portfolio-media", model.slug, search.preview, search.t ?? ""],
+    queryFn: () =>
+      fetchMedia({
+        data: { slug: model.slug, preview: search.preview, token: search.t },
+      }) as Promise<MediaItem[]>,
+    staleTime: 30_000,
+  });
+
+  const hero = media.find((m) => m.section_id === "__hero");
+  const mediaBySection = (id: string) =>
+    media.filter((m) => m.section_id === id).sort((a, b) => 0); // already ordered by server
 
   return (
     <div className="flex min-h-screen flex-col text-korum-navy">
@@ -58,12 +163,18 @@ function PortfolioModelPage() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 py-10 md:gap-14 md:px-12 md:py-16 lg:grid-cols-2">
           <div className="relative">
             <div className="relative overflow-hidden rounded-3xl border-4" style={{ borderColor: model.accent, aspectRatio: "4 / 3" }}>
-              <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-brand-heavy select-none text-korum-paper" style={{ fontSize: "clamp(4rem, 14vw, 10rem)", textShadow: `0 0 40px ${model.accent}` }}>
-                  {model.name.slice(0, 3).toUpperCase()}
-                </span>
-              </div>
+              {hero ? (
+                <MediaRenderer item={hero} />
+              ) : (
+                <>
+                  <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-brand-heavy select-none text-korum-paper" style={{ fontSize: "clamp(4rem, 14vw, 10rem)", textShadow: `0 0 40px ${model.accent}` }}>
+                      {model.name.slice(0, 3).toUpperCase()}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -94,6 +205,7 @@ function PortfolioModelPage() {
         <div className="mx-auto flex max-w-5xl flex-col gap-16 px-6 py-14 md:gap-24 md:px-12 md:py-24">
           {model.sections.map((section: PortfolioSection, index: number) => {
             const number = String(index + 1).padStart(2, "0");
+            const sectionItems = mediaBySection(section.id);
             return (
               <article key={section.id} id={section.id} className="scroll-mt-24">
                 <EyebrowTag>{number} · {section.eyebrow}</EyebrowTag>
@@ -102,9 +214,13 @@ function PortfolioModelPage() {
                   {section.body.map((paragraph: string) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
 
-                <div className="mt-8 flex items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-16 text-center text-korum-navy/55 md:py-24">
-                  <span className="font-mono text-sm md:text-base">Fotos e vídeos entram pelo painel</span>
-                </div>
+                {sectionItems.length > 0 ? (
+                  <Gallery items={sectionItems} />
+                ) : (
+                  <div className="mt-8 flex items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-16 text-center text-korum-navy/55 md:py-24">
+                    <span className="font-mono text-sm md:text-base">Fotos e vídeos entram pelo painel</span>
+                  </div>
+                )}
 
                 {section.chips.length > 0 && (
                   <div className="mt-8 flex flex-wrap gap-2 md:gap-3">
