@@ -201,6 +201,7 @@ function PortfolioModelPage() {
         <div className="mx-auto flex max-w-5xl flex-col gap-16 px-6 py-14 md:gap-24 md:px-12 md:py-24">
           {model.sections.map((section: PortfolioSection, index: number) => {
             const number = String(index + 1).padStart(2, "0");
+            const sectionItems = mediaBySection(section.id);
             return (
               <article key={section.id} id={section.id} className="scroll-mt-24">
                 <EyebrowTag>{number} · {section.eyebrow}</EyebrowTag>
@@ -209,9 +210,13 @@ function PortfolioModelPage() {
                   {section.body.map((paragraph: string) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
 
-                <div className="mt-8 flex items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-16 text-center text-korum-navy/55 md:py-24">
-                  <span className="font-mono text-sm md:text-base">Fotos e vídeos entram pelo painel</span>
-                </div>
+                {sectionItems.length > 0 ? (
+                  <Gallery items={sectionItems} />
+                ) : (
+                  <div className="mt-8 flex items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-16 text-center text-korum-navy/55 md:py-24">
+                    <span className="font-mono text-sm md:text-base">Fotos e vídeos entram pelo painel</span>
+                  </div>
+                )}
 
                 {section.chips.length > 0 && (
                   <div className="mt-8 flex flex-wrap gap-2 md:gap-3">
