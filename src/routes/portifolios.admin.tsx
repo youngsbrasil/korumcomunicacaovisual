@@ -93,7 +93,7 @@ function AdminPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--korum-navy))] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper">
         <p className="opacity-70">Carregando…</p>
       </div>
     );
@@ -104,14 +104,14 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--korum-navy))] text-white px-6">
+    <div className="min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper px-6">
       <form onSubmit={onSubmit} className="w-full max-w-sm flex flex-col items-center gap-6">
         <KorumLogo className="h-14 w-auto" />
         <div className="text-center">
           <h1 className="font-[Archivo_Black,sans-serif] text-3xl md:text-4xl">Painel Korum</h1>
           <p
             className="mt-1 tracking-widest text-sm"
-            style={{ fontFamily: "Space Mono, monospace", color: "hsl(var(--korum-green))" }}
+            style={{ fontFamily: "Space Mono, monospace", color: "var(--korum-green)" }}
           >
             PORTFÓLIOS
           </p>
@@ -124,7 +124,7 @@ function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Senha"
-            className="w-full px-4 py-3 rounded-md bg-white/10 border border-white/15 focus:border-[hsl(var(--korum-green))] outline-none placeholder:text-white/40"
+            className="w-full px-4 py-3 rounded-md bg-white/10 border border-white/15 focus:border-korum-green outline-none placeholder:text-white/40"
             required
           />
         </label>
@@ -132,7 +132,7 @@ function AdminPage() {
         <button
           type="submit"
           disabled={submitting || !password}
-          className="w-full px-6 py-3 rounded-md bg-[hsl(var(--korum-green))] text-[hsl(var(--korum-navy))] font-semibold hover:opacity-90 disabled:opacity-50 transition"
+          className="w-full px-6 py-3 rounded-md bg-korum-green text-korum-navy font-semibold hover:opacity-90 disabled:opacity-50 transition"
         >
           {submitting ? "Entrando…" : "Entrar"}
         </button>
@@ -315,9 +315,9 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
         : "Tudo salvo";
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--korum-navy))] text-white pb-28">
+    <div className="min-h-screen bg-korum-navy text-korum-paper pb-28">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 bg-[hsl(var(--korum-navy))]/95 backdrop-blur border-b border-white/10 px-6 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-20 bg-korum-navy/95 backdrop-blur border-b border-white/10 px-6 py-3 flex items-center justify-between">
         <KorumLogo className="h-8 w-auto" />
         <div className="flex items-center gap-4 text-sm">
           <span className="opacity-60 hidden md:inline">{statusText}</span>
@@ -339,7 +339,7 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
               onClick={() => setActiveSlug(m.slug)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
                 activeSlug === m.slug
-                  ? "bg-[hsl(var(--korum-green))] text-[hsl(var(--korum-navy))]"
+                  ? "bg-korum-green text-korum-navy"
                   : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
@@ -408,7 +408,7 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
       </div>
 
       {/* Bottom bar */}
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-[hsl(var(--korum-navy))]/95 backdrop-blur border-t border-white/10 px-4 py-3 flex gap-3 justify-end">
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-korum-navy/95 backdrop-blur border-t border-white/10 px-4 py-3 flex gap-3 justify-end">
         <button
           onClick={handlePreview}
           className="px-5 py-2.5 rounded-md border border-white/25 hover:bg-white/10 text-sm font-medium transition inline-flex items-center gap-2"
@@ -418,7 +418,7 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
         <button
           onClick={handlePublish}
           disabled={publishing}
-          className="px-5 py-2.5 rounded-md bg-[hsl(var(--korum-green))] text-[hsl(var(--korum-navy))] font-semibold hover:opacity-90 disabled:opacity-50 text-sm transition"
+          className="px-5 py-2.5 rounded-md bg-korum-green text-korum-navy font-semibold hover:opacity-90 disabled:opacity-50 text-sm transition"
         >
           {publishing ? "Publicando…" : "Publicar"}
         </button>
@@ -461,7 +461,7 @@ function SectionBlock({
       <div className="mb-4">
         <p
           className="text-xs uppercase tracking-widest"
-          style={{ fontFamily: "Space Mono, monospace", color: "hsl(var(--korum-green))" }}
+          style={{ fontFamily: "Space Mono, monospace", color: "var(--korum-green)" }}
         >
           {subtitle}
         </p>
@@ -483,7 +483,7 @@ function SectionBlock({
         }}
         className={`cursor-pointer border-2 border-dashed rounded-lg px-4 py-8 text-center text-sm transition ${
           dragOver
-            ? "border-[hsl(var(--korum-green))] bg-[hsl(var(--korum-green))]/10"
+            ? "border-korum-green bg-korum-green/10"
             : "border-white/20 hover:border-white/40 hover:bg-white/5"
         }`}
       >
@@ -510,7 +510,7 @@ function SectionBlock({
           value={linkValue}
           onChange={(e) => setLinkValue(e.target.value)}
           placeholder="Ou cole link do YouTube/Instagram"
-          className="flex-1 px-3 py-2 rounded-md bg-white/10 border border-white/15 focus:border-[hsl(var(--korum-green))] outline-none text-sm placeholder:text-white/40"
+          className="flex-1 px-3 py-2 rounded-md bg-white/10 border border-white/15 focus:border-korum-green outline-none text-sm placeholder:text-white/40"
         />
         <button
           onClick={() => {

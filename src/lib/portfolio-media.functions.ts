@@ -1,6 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+type PortfolioMediaRow = {
+  id: string;
+  slug: string;
+  section_id: string;
+  status: string;
+  kind: string;
+  url: string;
+  caption: string | null;
+  alt: string | null;
+  ordem: number;
+  created_at: string;
+};
+
 function verifyAdmin(token: string | undefined | null): boolean {
   if (!token) return false;
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -19,14 +32,136 @@ function isAbsoluteUrl(u: string) {
   return /^https?:\/\//i.test(u) || u.startsWith("/__l5e/") || u.startsWith("/");
 }
 
+function hasServiceRoleKey() {
+  return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function getPostgresConfig() {
+  const connectionString = process.env.SUPABASE_DB_URL;
+  if (connectionString) {
+    return {
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+    };
+  }
+
+  const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+  if (!PGHOST || !PGDATABASE || !PGUSER || !PGPASSWORD) return null;
+
+  return {
+    host: PGHOST,
+    port: PGPORT ? Number(PGPORT) : 5432,
+    database: PGDATABASE,
+    user: PGUSER,
+    password: PGPASSWORD,
+    ssl: process.env.PGSSLMODE === "disable" ? false : { rejectUnauthorized: false },
+  };
+}
+
+function hasPostgresConfig() {
+  return Boolean(process.env.SUPABASE_DB_URL || getPostgresConfig());
+}
+
+async function withPortfolioDb<T>(callback: (client: import("pg").PoolClient) => Promise<T>) {
+  const config = getPostgresConfig();
+  if (!config) {
+    throw new Error("Banco de dados não configurado no preview.");
+  }
+
+  const { Pool } = await import("pg");
+  const pool = new Pool(config);
+  const client = await pool.connect();
+  try {
+    return await callback(client);
+  } finally {
+    client.release();
+    await pool.end();
+  }
+}
+
+function mapPortfolioRow(row: Record<string, unknown>): PortfolioMediaRow {
+  return {
+    id: String(row.id),
+    slug: String(row.slug),
+    section_id: String(row.section_id),
+    status: String(row.status),
+    kind: String(row.kind),
+    url: String(row.url),
+    caption: row.caption == null ? null : String(row.caption),
+    alt: row.alt == null ? null : String(row.alt),
+    ordem: Number(row.ordem ?? 0),
+    created_at:
+      row.created_at instanceof Date
+        ? row.created_at.toISOString()
+        : String(row.created_at ?? new Date().toISOString()),
+  };
+}
+
+async function readMediaRows(slug: string, status: "draft" | "published") {
+  if (hasServiceRoleKey()) {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("portfolio_media")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", status)
+      .order("section_id")
+      .order("ordem");
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((row) => mapPortfolioRow(row));
+  }
+
+  if (!hasPostgresConfig()) {
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error("Supabase não configurado no preview.");
+    }
+
+    const supabasePublic = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        storage: undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+    const { data: rows, error } = await supabasePublic
+      .from("portfolio_media")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", status)
+      .order("section_id")
+      .order("ordem");
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((row) => mapPortfolioRow(row));
+  }
+
+  return withPortfolioDb(async (client) => {
+    const result = await client.query(
+      `SELECT id, slug, section_id, status, kind, url, caption, alt, ordem, created_at
+       FROM public.portfolio_media
+       WHERE slug = $1 AND status = $2
+       ORDER BY section_id ASC, ordem ASC`,
+      [slug, status],
+    );
+    return result.rows.map(mapPortfolioRow);
+  });
+}
+
 async function signUrls<T extends { kind: string; url: string }>(
   rows: T[],
 ): Promise<(T & { signedUrl: string })[]> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabaseAdmin = hasServiceRoleKey()
+    ? (await import("@/integrations/supabase/client.server")).supabaseAdmin
+    : null;
   return Promise.all(
     rows.map(async (row) => {
       if (row.kind === "videolink" || isAbsoluteUrl(row.url)) {
         return { ...row, signedUrl: row.url };
+      }
+      if (!supabaseAdmin) {
+        return { ...row, signedUrl: "" };
       }
       const { data } = await supabaseAdmin.storage
         .from("portfolios")
@@ -49,16 +184,8 @@ export const getMediaForView = createServerFn({ method: "POST" })
       // preview requires admin token
       return [];
     }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from("portfolio_media")
-      .select("*")
-      .eq("slug", data.slug)
-      .eq("status", status)
-      .order("section_id")
-      .order("ordem");
-    if (error) throw new Error(error.message);
-    return signUrls(rows ?? []);
+    const rows = await readMediaRows(data.slug, status);
+    return signUrls(rows);
   });
 
 // ============ ADMIN OPS ============
@@ -69,16 +196,11 @@ export const adminListDraft = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from("portfolio_media")
-      .select("*")
-      .eq("slug", data.slug)
-      .eq("status", "draft")
-      .order("section_id")
-      .order("ordem");
-    if (error) throw new Error(error.message);
-    return signUrls(rows ?? []);
+    let rows = await readMediaRows(data.slug, "draft");
+    if (rows.length === 0 && !hasServiceRoleKey() && !hasPostgresConfig()) {
+      rows = await readMediaRows(data.slug, "published");
+    }
+    return signUrls(rows);
   });
 
 export const adminCreateSignedUpload = createServerFn({ method: "POST" })
@@ -89,6 +211,9 @@ export const adminCreateSignedUpload = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      throw new Error("Upload indisponível: SUPABASE_SERVICE_ROLE_KEY não está configurada.");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const uuid = crypto.randomUUID();
     const path = `${data.slug}/${uuid}.${data.ext}`;
@@ -121,6 +246,50 @@ export const adminInsertMedia = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      return withPortfolioDb(async (client) => {
+        await client.query("BEGIN");
+        try {
+          if (data.section_id === "__hero") {
+            await client.query(
+              `DELETE FROM public.portfolio_media
+               WHERE slug = $1 AND section_id = '__hero' AND status = 'draft'`,
+              [data.slug],
+            );
+          }
+
+          const maxResult = await client.query(
+            `SELECT ordem
+             FROM public.portfolio_media
+             WHERE slug = $1 AND section_id = $2 AND status = 'draft'
+             ORDER BY ordem DESC
+             LIMIT 1`,
+            [data.slug, data.section_id],
+          );
+          const nextOrdem = Number(maxResult.rows[0]?.ordem ?? -1) + 1;
+          const inserted = await client.query(
+            `INSERT INTO public.portfolio_media (slug, section_id, status, kind, url, caption, alt, ordem)
+             VALUES ($1, $2, 'draft', $3, $4, $5, $6, $7)
+             RETURNING id, slug, section_id, status, kind, url, caption, alt, ordem, created_at`,
+            [
+              data.slug,
+              data.section_id,
+              data.kind,
+              data.url,
+              data.caption,
+              data.alt,
+              nextOrdem,
+            ],
+          );
+          await client.query("COMMIT");
+          return mapPortfolioRow(inserted.rows[0]);
+        } catch (error) {
+          await client.query("ROLLBACK");
+          throw error;
+        }
+      });
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // hero section allows only 1 item — replace any existing
     if (data.section_id === "__hero") {
@@ -183,6 +352,19 @@ export const adminUpdateMedia = createServerFn({ method: "POST" })
     if (data.alt !== undefined) patch.alt = data.alt;
     if (data.ordem !== undefined) patch.ordem = data.ordem;
     if (Object.keys(patch).length === 0) return { ok: true };
+    if (!hasServiceRoleKey()) {
+      await withPortfolioDb(async (client) => {
+        await client.query(
+          `UPDATE public.portfolio_media
+           SET caption = COALESCE($1, caption),
+               alt = COALESCE($2, alt),
+               ordem = COALESCE($3, ordem)
+           WHERE id = $4`,
+          [patch.caption ?? null, patch.alt ?? null, patch.ordem ?? null, data.id],
+        );
+      });
+      return { ok: true };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("portfolio_media").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -196,6 +378,24 @@ export const adminReorderMedia = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      await withPortfolioDb(async (client) => {
+        await client.query("BEGIN");
+        try {
+          for (let index = 0; index < data.ids.length; index += 1) {
+            await client.query("UPDATE public.portfolio_media SET ordem = $1 WHERE id = $2", [
+              index,
+              data.ids[index],
+            ]);
+          }
+          await client.query("COMMIT");
+        } catch (error) {
+          await client.query("ROLLBACK");
+          throw error;
+        }
+      });
+      return { ok: true };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await Promise.all(
       data.ids.map((id, index) =>
@@ -212,6 +412,12 @@ export const adminDeleteMedia = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      await withPortfolioDb(async (client) => {
+        await client.query("DELETE FROM public.portfolio_media WHERE id = $1", [data.id]);
+      });
+      return { ok: true };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
       .from("portfolio_media")
@@ -233,6 +439,30 @@ export const adminPublishSlug = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      return withPortfolioDb(async (client) => {
+        await client.query("BEGIN");
+        try {
+          await client.query(
+            "DELETE FROM public.portfolio_media WHERE slug = $1 AND status = 'published'",
+            [data.slug],
+          );
+          const inserted = await client.query(
+            `INSERT INTO public.portfolio_media (slug, section_id, kind, url, caption, alt, ordem, status)
+             SELECT slug, section_id, kind, url, caption, alt, ordem, 'published'
+             FROM public.portfolio_media
+             WHERE slug = $1 AND status = 'draft'
+             RETURNING id`,
+            [data.slug],
+          );
+          await client.query("COMMIT");
+          return { ok: true, count: inserted.rowCount ?? 0 };
+        } catch (error) {
+          await client.query("ROLLBACK");
+          throw error;
+        }
+      });
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // delete existing published
     await supabaseAdmin
