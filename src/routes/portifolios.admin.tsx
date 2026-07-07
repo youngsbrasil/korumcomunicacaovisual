@@ -17,6 +17,7 @@ import {
   adminUpdateMedia,
 } from "@/lib/portfolio-media.functions";
 import { models } from "@/data/models";
+import { compressImage, formatBytes } from "@/lib/image-compress";
 
 const TOKEN_KEY = "korum_admin_token";
 
