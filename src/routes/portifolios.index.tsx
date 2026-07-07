@@ -91,9 +91,12 @@ function PortfolioIndex() {
                   ) : cover && cover.kind === "video" && cover.signedUrl ? (
                     <video src={cover.signedUrl} className="h-full w-full object-cover" muted playsInline loop autoPlay />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center font-mono text-xs text-korum-paper/40">
-                      sem capa publicada
-                    </div>
+                    <img
+                      src={fallbackCovers[model.slug]}
+                      alt={model.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
                   )}
                 </div>
                 <div className="p-6 md:p-8">
