@@ -1,7 +1,10 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import {
+import { motion, useInView } from "framer-motion";
+import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { useEffect, useRef, useState } from "react";
+
   Building2,
   Store,
   Briefcase,
