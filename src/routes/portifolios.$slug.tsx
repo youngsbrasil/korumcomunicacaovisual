@@ -145,9 +145,11 @@ function parseSubtitle(text: string) {
 /** Slide frame: fixed 9:16, centered, snap target. Dark theme. */
 function Slide({
   bg = "navy",
+  role,
   children,
 }: {
   bg?: "navy" | "navy-deep";
+  role?: string;
   children: React.ReactNode;
 }) {
   const bgColor = bg === "navy-deep" ? "#0f1626" : "#182338";
@@ -156,6 +158,7 @@ function Slide({
       <div
         data-slide
         data-slide-bg={bgColor}
+        data-slide-role={role}
         className="slide relative overflow-hidden rounded-2xl shadow-2xl"
         style={{
           width: "min(calc(100vw - 24px), calc((100dvh - 32px) * 9 / 16))",
@@ -169,6 +172,7 @@ function Slide({
     </div>
   );
 }
+
 
 /** Slim brand block bar (Korum identity). */
 function BrandBlocks() {
