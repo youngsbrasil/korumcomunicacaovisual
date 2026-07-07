@@ -803,7 +803,7 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90"
+                className="hover-lift inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <MessageCircle className="h-4 w-4" /> Pedir orçamento
@@ -849,14 +849,14 @@ function PortfolioModelPage() {
                 type="button"
                 onClick={handleGeneratePdf}
                 disabled={pdfLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
               </button>
               <a
                 href={mailtoUrl}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
                 style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
               >
                 <Mail className="h-4 w-4" /> Enviar por e-mail
@@ -865,7 +865,7 @@ function PortfolioModelPage() {
                 href={waShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
                 style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
               >
                 <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
@@ -874,7 +874,7 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
+                class="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <Phone className="h-4 w-4" /> Entrar em contato agora
