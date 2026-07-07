@@ -29,7 +29,17 @@ const shortDesc: Record<string, string> = {
   supermercados: "Painéis suspensos, faixas de gôndola e fachadas que vendem.",
 };
 
+type Cover = { slug: string; kind: string; url: string; signedUrl: string };
+
 function PortfolioIndex() {
+  const fetchCovers = useServerFn(getPublishedCovers);
+  const { data: covers = [] } = useQuery({
+    queryKey: ["portfolio-covers"],
+    queryFn: () => fetchCovers({ data: {} }) as Promise<Cover[]>,
+    staleTime: 60_000,
+  });
+  const coverBySlug = new Map(covers.map((c) => [c.slug, c]));
+
   return (
     <div className="flex min-h-screen flex-col bg-korum-navy text-korum-paper">
       <TopBlocks />
@@ -53,19 +63,41 @@ function PortfolioIndex() {
         </p>
 
         <div className="mt-10 grid grid-cols-1 gap-5 md:mt-14 md:grid-cols-2 md:gap-6">
-          {models.map((model) => (
-            <Link key={model.slug} to="/portifolios/$slug" params={{ slug: model.slug }} className="group relative overflow-hidden rounded-2xl border border-korum-paper/10 bg-korum-paper/5 p-6 transition-colors hover:bg-korum-paper/10 md:p-8">
-              <div className="absolute left-0 top-0 h-1 w-full" style={{ background: model.accent }} aria-hidden />
-              <EyebrowTag>{model.eyebrow}</EyebrowTag>
-              <h2 className="font-brand-heavy mt-3 text-2xl leading-tight tracking-normal text-korum-paper md:text-3xl">{model.name}</h2>
-              <p className="mt-3 text-sm text-korum-paper/70 md:text-base">{shortDesc[model.slug]}</p>
-              <span className="mt-6 inline-flex items-center gap-2 text-sm font-mono" style={{ color: model.accent }}>
-                Ver portfólio →
-              </span>
-            </Link>
-          ))}
+          {models.map((model) => {
+            const cover = coverBySlug.get(model.slug);
+            return (
+              <Link key={model.slug} to="/portifolios/$slug" params={{ slug: model.slug }} className="group relative flex flex-col overflow-hidden rounded-2xl border border-korum-paper/10 bg-korum-paper/5 transition-colors hover:bg-korum-paper/10">
+                <div className="absolute left-0 top-0 z-10 h-1 w-full" style={{ background: model.accent }} aria-hidden />
+                <div className="relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden bg-korum-navy-deep">
+                  {cover && cover.kind === "image" && cover.signedUrl ? (
+                    <img
+                      src={cover.signedUrl}
+                      alt={model.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
+                  ) : cover && cover.kind === "video" && cover.signedUrl ? (
+                    <video src={cover.signedUrl} className="h-full w-full object-cover" muted playsInline loop autoPlay />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center font-mono text-xs text-korum-paper/40">
+                      sem capa publicada
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 md:p-8">
+                  <EyebrowTag>{model.eyebrow}</EyebrowTag>
+                  <h2 className="font-brand-heavy mt-3 text-2xl leading-tight tracking-normal text-korum-paper md:text-3xl">{model.name}</h2>
+                  <p className="mt-3 text-sm text-korum-paper/70 md:text-base">{shortDesc[model.slug]}</p>
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-mono" style={{ color: model.accent }}>
+                    Ver portfólio →
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </main>
+
 
       <footer className="border-t border-korum-paper/10 bg-korum-navy-deep px-6 py-8 md:px-12">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 md:flex-row md:items-center">
