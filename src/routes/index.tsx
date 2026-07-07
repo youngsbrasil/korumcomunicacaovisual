@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { HardHat, MessageCircle, PanelsTopLeft, Wrench } from "lucide-react";
 
 import { VoxelScene } from "@/components/VoxelScene";
+import { SiteSignature } from "@/components/brand/SiteSignature";
 import logoKorum from "@/assets/logo-korum-bco.png.asset.json";
 
 export const Route = createFileRoute("/")({
