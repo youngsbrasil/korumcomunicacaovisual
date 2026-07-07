@@ -78,7 +78,10 @@ function Index() {
         </div>
       </motion.div>
 
-      <p className="absolute bottom-4 text-xs text-korum-paper/60">© {new Date().getFullYear()} Korum Comunicação Visual. Todos os direitos reservados.</p>
+      <div className="absolute bottom-3 left-0 right-0 flex flex-col items-center gap-1 px-4">
+        <p className="text-xs text-korum-paper/60">© {new Date().getFullYear()} Korum Comunicação Visual. Todos os direitos reservados.</p>
+        <SiteSignature />
+      </div>
     </main>
   );
 }
