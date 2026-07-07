@@ -207,8 +207,14 @@ async function signUrls<T extends { kind: string; url: string }>(
   const supabaseAdmin = hasServiceRoleKey()
     ? (await import("@/integrations/supabase/client.server")).supabaseAdmin
     : null;
+  const L5E_PREVIEW_ORIGIN = "https://id-preview--3b9189aa-77d5-4163-bcb3-49187126d4c0.lovable.app";
   return Promise.all(
     rows.map(async (row) => {
+      // Legacy preview-only asset paths: rewrite to preview origin so the
+      // published site can still fetch them until the migration runs.
+      if (row.url.startsWith("/__l5e/")) {
+        return { ...row, signedUrl: `${L5E_PREVIEW_ORIGIN}${row.url}` };
+      }
       if (row.kind === "videolink" || isAbsoluteUrl(row.url)) {
         return { ...row, signedUrl: row.url };
       }
