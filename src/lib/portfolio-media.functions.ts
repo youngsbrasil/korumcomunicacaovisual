@@ -613,3 +613,87 @@ export const adminPublishSlug = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     return { ok: true, count: toInsert.length };
   });
+
+// One-shot migration: fetch any /__l5e/... assets from the preview host,
+// upload them to the portfolios storage bucket, and rewrite the DB rows.
+// Requires ADMIN_SESSION_SECRET token (same as other admin ops).
+export const adminMigrateL5eAssets = createServerFn({ method: "POST" })
+  .inputValidator((data: { token: string; previewOrigin?: string }) => ({
+    token: String(data.token).slice(0, 512),
+    previewOrigin:
+      data.previewOrigin ??
+      "https://id-preview--3b9189aa-77d5-4163-bcb3-49187126d4c0.lovable.app",
+  }))
+  .handler(async ({ data }) => {
+    if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey()) {
+      throw new Error("Migration requires service role key on the server.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("portfolio_media")
+      .select("id, slug, kind, url")
+      .like("url", "/__l5e/%");
+    if (error) throw new Error(error.message);
+
+    const results: Array<{ id: string; ok: boolean; newUrl?: string; error?: string }> = [];
+    // dedupe: same source url -> upload once, reuse path
+    const uploaded = new Map<string, string>();
+
+    for (const row of rows ?? []) {
+      try {
+        if (row.kind === "videolink") {
+          results.push({ id: row.id, ok: false, error: "skip videolink" });
+          continue;
+        }
+        const src = row.url as string;
+        let newPath = uploaded.get(src);
+        if (!newPath) {
+          const fetchUrl = `${data.previewOrigin}${src}`;
+          const res = await fetch(fetchUrl);
+          if (!res.ok) throw new Error(`fetch ${res.status}`);
+          const contentType = res.headers.get("content-type") ?? "application/octet-stream";
+          const buf = new Uint8Array(await res.arrayBuffer());
+          // derive extension from URL or content-type
+          const urlExt = src.split(".").pop()?.toLowerCase();
+          const ext =
+            urlExt && /^(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v)$/.test(urlExt)
+              ? urlExt
+              : contentType.includes("png")
+                ? "png"
+                : contentType.includes("webp")
+                  ? "webp"
+                  : contentType.includes("gif")
+                    ? "gif"
+                    : contentType.includes("mp4")
+                      ? "mp4"
+                      : contentType.includes("webm")
+                        ? "webm"
+                        : "jpg";
+          newPath = `${row.slug}/${crypto.randomUUID()}.${ext}`;
+          const { error: upErr } = await supabaseAdmin.storage
+            .from("portfolios")
+            .upload(newPath, buf, { contentType, upsert: false });
+          if (upErr) throw new Error(`upload: ${upErr.message}`);
+          uploaded.set(src, newPath);
+        }
+        const { error: updErr } = await supabaseAdmin
+          .from("portfolio_media")
+          .update({ url: newPath })
+          .eq("id", row.id);
+        if (updErr) throw new Error(`update: ${updErr.message}`);
+        results.push({ id: row.id, ok: true, newUrl: newPath });
+      } catch (e) {
+        results.push({ id: row.id, ok: false, error: e instanceof Error ? e.message : String(e) });
+      }
+    }
+
+    return {
+      ok: true,
+      total: rows?.length ?? 0,
+      migrated: results.filter((r) => r.ok).length,
+      failed: results.filter((r) => !r.ok).length,
+      results,
+    };
+  });
