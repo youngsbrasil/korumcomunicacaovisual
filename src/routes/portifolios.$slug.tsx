@@ -1,7 +1,44 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { FileDown, Mail, MessageCircle, Phone, Share2 } from "lucide-react";
+import {
+  Building2,
+  Store,
+  Briefcase,
+  CalendarDays,
+  Eye,
+  Fuel,
+  ShoppingCart,
+  Smartphone,
+  Headset,
+  Plus,
+  MapPin,
+  Ruler,
+  Boxes,
+  Layers,
+  Cpu,
+  Monitor,
+  Radio,
+  Tag,
+  Package,
+  Trash2,
+  Droplet,
+  Wrench,
+  CalendarClock,
+  Link2,
+  Megaphone,
+  LayoutGrid,
+  Palette,
+  Sparkles,
+  Sticker,
+  Signpost,
+  FileDown,
+  Mail,
+  MessageCircle,
+  Phone,
+  Share2,
+  type LucideIcon,
+} from "lucide-react";
 import { useState } from "react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
