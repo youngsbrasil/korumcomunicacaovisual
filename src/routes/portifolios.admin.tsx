@@ -337,8 +337,16 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
       {/* Top bar */}
       <header className="sticky top-0 z-20 bg-korum-navy/95 backdrop-blur border-b border-white/10 px-6 py-3 flex items-center justify-between">
         <KorumLogo className="h-8 w-auto" />
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-3 text-sm">
           <span className="opacity-60 hidden md:inline">{statusText}</span>
+          <button
+            onClick={handleMigrateL5e}
+            disabled={migrating}
+            className="px-3 py-1.5 rounded-md border border-korum-green/60 text-korum-green hover:bg-korum-green/10 transition disabled:opacity-50"
+            title="Corrige imagens antigas que somem no site publicado"
+          >
+            {migrating ? "Migrando…" : "Migrar imagens antigas"}
+          </button>
           <button
             onClick={onLogout}
             className="px-3 py-1.5 rounded-md border border-white/20 hover:bg-white/10 transition"
