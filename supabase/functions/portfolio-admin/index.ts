@@ -125,7 +125,12 @@ Deno.serve(async (request) => {
   }
 
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
-  if (!body || !(await verifyAdmin(body.token))) {
+  if (!body) {
+    return json(400, { ok: false, error: "Requisição inválida." });
+  }
+
+  const isPublicOp = body.op === "listPublished";
+  if (!isPublicOp && !(await verifyAdmin(body.token))) {
     return json(401, { ok: false, error: "Acesso não autorizado." });
   }
 
@@ -136,6 +141,18 @@ Deno.serve(async (request) => {
 
   try {
     switch (body.op) {
+      case "listPublished": {
+        const slug = cleanSlug(body.slug);
+        const { data: rows, error } = await supabaseAdmin
+          .from("portfolio_media")
+          .select("*")
+          .eq("slug", slug)
+          .eq("status", "published")
+          .order("section_id")
+          .order("ordem");
+        if (error) throw error;
+        return json(200, { ok: true, result: await signRows(supabaseAdmin, rows ?? []) });
+      }
       case "list": {
         const slug = cleanSlug(body.slug);
         const { data: rows, error } = await supabaseAdmin

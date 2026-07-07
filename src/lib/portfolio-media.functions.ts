@@ -32,7 +32,8 @@ type PortfolioAdminPayload =
   | { op: "updateMedia"; token: string; id: string; caption?: string; alt?: string; ordem?: number }
   | { op: "reorderMedia"; token: string; ids: string[] }
   | { op: "deleteMedia"; token: string; id: string }
-  | { op: "publishSlug"; token: string; slug: string };
+  | { op: "publishSlug"; token: string; slug: string }
+  | { op: "listPublished"; slug: string };
 
 function verifyAdmin(token: string | undefined | null): boolean {
   if (!token) return false;
@@ -246,6 +247,15 @@ export const getMediaForView = createServerFn({ method: "POST" })
       return callPortfolioAdminEdge<SignedPortfolioMediaRow[]>({
         op: "list",
         token: data.token ?? "",
+        slug: data.slug,
+      });
+    }
+    // Public view: if we can't sign storage URLs locally (no service role /
+    // no direct DB), delegate to the edge function which has the service role
+    // and can produce proper signed URLs for private-bucket assets.
+    if (!data.preview && !hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<SignedPortfolioMediaRow[]>({
+        op: "listPublished",
         slug: data.slug,
       });
     }
