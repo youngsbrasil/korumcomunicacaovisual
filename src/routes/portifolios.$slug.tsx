@@ -104,13 +104,22 @@ function MediaRenderer({ item }: { item: MediaItem }) {
       <img
         src={item.signedUrl}
         alt={item.caption ?? ""}
-        className="w-full h-full object-cover"
+        className="max-h-full max-w-full h-auto w-auto object-contain"
+        style={{ display: "block", margin: "auto" }}
         loading="lazy"
       />
     );
   }
   if (item.kind === "video") {
-    return <video src={item.signedUrl} controls playsInline className="w-full h-full object-cover" />;
+    return (
+      <video
+        src={item.signedUrl}
+        controls
+        playsInline
+        className="max-h-full max-w-full h-auto w-auto object-contain"
+        style={{ display: "block", margin: "auto" }}
+      />
+    );
   }
   const yt = youtubeId(item.url);
   if (yt) {
@@ -120,7 +129,8 @@ function MediaRenderer({ item }: { item: MediaItem }) {
         title={item.caption ?? "Vídeo"}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-full"
+        className="h-full w-full"
+        style={{ aspectRatio: "16 / 9" }}
       />
     );
   }
