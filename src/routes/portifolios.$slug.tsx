@@ -358,16 +358,26 @@ function PortfolioModelPage() {
     if (pdfLoading) return;
     setPdfLoading(true);
     try {
-      const slides = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
-      if (slides.length === 0) throw new Error("no slides");
+      const deckEl = document.querySelector<HTMLElement>(".deck");
+      const siteSlides = Array.from(
+        deckEl?.querySelectorAll<HTMLElement>("[data-slide]") ?? [],
+      );
+      if (siteSlides.length === 0) throw new Error("no slides");
+
+      const pdfActionsSlide = document.querySelector<HTMLElement>(
+        "[data-pdf-actions] [data-slide]",
+      );
 
       const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
       const prevDisplay = floating?.style.display ?? "";
       if (floating) floating.style.display = "none";
 
-      // Wait for images inside slides (with per-image timeout)
-      const imgs = slides.flatMap((s) => Array.from(s.querySelectorAll("img")));
-      
+      const captureSlides: HTMLElement[] = siteSlides.map((slide) =>
+        slide.dataset.slideRole === "actions" && pdfActionsSlide ? pdfActionsSlide : slide,
+      );
+
+      // Wait for images inside all slides we'll capture
+      const imgs = captureSlides.flatMap((s) => Array.from(s.querySelectorAll("img")));
       await Promise.all(
         imgs.map(
           (img) =>
@@ -380,7 +390,6 @@ function PortfolioModelPage() {
             }),
         ),
       );
-      
 
       const [{ toJpeg }, { jsPDF }] = await Promise.all([
         import("html-to-image"),
@@ -397,13 +406,13 @@ function PortfolioModelPage() {
         format: [pdfWidthMM, pdfHeightMM],
       });
 
-      for (let i = 0; i < slides.length; i++) {
-        const slide = slides[i];
-        const bg = slide.getAttribute("data-slide-bg") || "#ffffff";
+      for (let i = 0; i < captureSlides.length; i++) {
+        const slide = captureSlides[i];
+        const bg = slide.getAttribute("data-slide-bg") || "#182338";
         const rect = slide.getBoundingClientRect();
         const targetW = 540;
         const scale = targetW / rect.width;
-        
+
         const imgData = await toJpeg(slide, {
           quality: 0.94,
           pixelRatio: 2,
@@ -416,9 +425,22 @@ function PortfolioModelPage() {
         });
         if (i > 0) pdf.addPage([pdfWidthMM, pdfHeightMM], "portrait");
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfHeightMM, "", "NONE");
+
+        // Add clickable link over the CTA button in the PDF-only actions slide
+        if (slide.dataset.slideRole === "actions-pdf") {
+          const cta = slide.querySelector<HTMLElement>("[data-pdf-cta]");
+          if (cta) {
+            const slideRect = slide.getBoundingClientRect();
+            const btnRect = cta.getBoundingClientRect();
+            const xMM = ((btnRect.left - slideRect.left) / slideRect.width) * pdfWidthMM;
+            const yMM = ((btnRect.top - slideRect.top) / slideRect.height) * pdfHeightMM;
+            const wMM = (btnRect.width / slideRect.width) * pdfWidthMM;
+            const hMM = (btnRect.height / slideRect.height) * pdfHeightMM;
+            pdf.link(xMM, yMM, wMM, hMM, { url: waCommercialUrl });
+          }
+        }
       }
 
-      
       if (floating) floating.style.display = prevDisplay;
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
