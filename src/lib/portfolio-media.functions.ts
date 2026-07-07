@@ -247,6 +247,39 @@ export const getMediaForView = createServerFn({ method: "POST" })
     return signUrls(rows);
   });
 
+// Cover (hero) images for all slugs, published-only. Used by /portifolios index.
+export const getPublishedCovers = createServerFn({ method: "POST" })
+  .inputValidator(() => ({}))
+  .handler(async () => {
+    let rows: PortfolioMediaRow[] = [];
+    if (hasServiceRoleKey()) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data, error } = await supabaseAdmin
+        .from("portfolio_media")
+        .select("*")
+        .eq("status", "published")
+        .eq("section_id", "__hero");
+      if (error) throw new Error(error.message);
+      rows = (data ?? []).map((r) => mapPortfolioRow(r as Record<string, unknown>));
+    } else {
+      const { createClient } = await import("@supabase/supabase-js");
+      const url = process.env.SUPABASE_URL;
+      const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+      if (!url || !key) return [] as SignedPortfolioMediaRow[];
+      const sb = createClient(url, key, {
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      });
+      const { data, error } = await sb
+        .from("portfolio_media")
+        .select("*")
+        .eq("status", "published")
+        .eq("section_id", "__hero");
+      if (error) throw new Error(error.message);
+      rows = (data ?? []).map((r) => mapPortfolioRow(r as Record<string, unknown>));
+    }
+    return signUrls(rows);
+  });
+
 // ============ ADMIN OPS ============
 export const adminListDraft = createServerFn({ method: "POST" })
   .inputValidator((data: { token: string; slug: string }) => ({
