@@ -469,8 +469,8 @@ function PortfolioModelPage() {
               {totalParts > 1 ? ` · 1/${totalParts}` : ""}
             </EyebrowTag>
             <h2
-              className="font-brand-heavy mt-5 leading-[1.05] tracking-tight"
-              style={{ fontSize: "clamp(1.9rem, 7vw, 2.9rem)", color: "#EFF1F3" }}
+              className="reveal font-brand-heavy mt-5 leading-[1.05] tracking-tight"
+              style={{ fontSize: "clamp(1.9rem, 7vw, 2.9rem)", color: "#EFF1F3", transitionDelay: "60ms" }}
             >
               {section.title}
             </h2>
@@ -479,13 +479,15 @@ function PortfolioModelPage() {
                 pi === 0 ? (
                   <p
                     key={p}
-                    className="pl-4 text-[16px] font-medium leading-relaxed md:text-lg"
-                    style={{ borderLeft: "2px solid #A6C939", color: "#E8ECF2" }}
+                    className="reveal pl-4 text-[16px] font-medium leading-relaxed md:text-lg"
+                    style={{ borderLeft: "2px solid #A6C939", color: "#E8ECF2", transitionDelay: `${140 + pi * 80}ms` }}
                   >
                     {p}
                   </p>
                 ) : (
-                  <p key={p}>{p}</p>
+                  <p key={p} className="reveal" style={{ transitionDelay: `${140 + pi * 80}ms` }}>
+                    {p}
+                  </p>
                 ),
               )}
             </div>
@@ -496,14 +498,15 @@ function PortfolioModelPage() {
                   return (
                     <span
                       key={chip}
-                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                      className="reveal inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
                       style={
                         ci === 0
-                          ? { backgroundColor: "#A6C939", color: "#182338" }
+                          ? { backgroundColor: "#A6C939", color: "#182338", transitionDelay: `${280 + ci * 55}ms` }
                           : {
                               backgroundColor: "#0f1626",
                               border: "1px solid #33455F",
                               color: "#C6CEDB",
+                              transitionDelay: `${280 + ci * 55}ms`,
                             }
                       }
                     >
