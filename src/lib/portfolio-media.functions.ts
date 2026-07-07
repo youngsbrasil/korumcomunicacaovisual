@@ -14,6 +14,26 @@ type PortfolioMediaRow = {
   created_at: string;
 };
 
+type SignedPortfolioMediaRow = PortfolioMediaRow & { signedUrl: string };
+
+type PortfolioAdminPayload =
+  | { op: "list"; token: string; slug: string }
+  | { op: "createSignedUpload"; token: string; slug: string; ext: string }
+  | {
+      op: "insertMedia";
+      token: string;
+      slug: string;
+      section_id: string;
+      kind: "image" | "video" | "videolink";
+      url: string;
+      caption?: string;
+      alt?: string;
+    }
+  | { op: "updateMedia"; token: string; id: string; caption?: string; alt?: string; ordem?: number }
+  | { op: "reorderMedia"; token: string; ids: string[] }
+  | { op: "deleteMedia"; token: string; id: string }
+  | { op: "publishSlug"; token: string; slug: string };
+
 function verifyAdmin(token: string | undefined | null): boolean {
   if (!token) return false;
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -60,6 +80,38 @@ function getPostgresConfig() {
 
 function hasPostgresConfig() {
   return Boolean(process.env.SUPABASE_DB_URL || getPostgresConfig());
+}
+
+function canCallPortfolioAdminEdge() {
+  return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY);
+}
+
+async function callPortfolioAdminEdge<T>(payload: PortfolioAdminPayload): Promise<T> {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Backend de portfólios não configurado.");
+  }
+
+  const response = await fetch(`${supabaseUrl}/functions/v1/portfolio-admin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = (await response.json().catch(() => null)) as
+    | { ok?: boolean; result?: T; error?: string }
+    | null;
+
+  if (!response.ok || !result?.ok) {
+    throw new Error(result?.error ?? `Falha no backend de portfólios (${response.status}).`);
+  }
+
+  return result.result as T;
 }
 
 async function withPortfolioDb<T>(callback: (client: import("pg").PoolClient) => Promise<T>) {
@@ -184,6 +236,13 @@ export const getMediaForView = createServerFn({ method: "POST" })
       // preview requires admin token
       return [];
     }
+    if (data.preview && !hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<SignedPortfolioMediaRow[]>({
+        op: "list",
+        token: data.token ?? "",
+        slug: data.slug,
+      });
+    }
     const rows = await readMediaRows(data.slug, status);
     return signUrls(rows);
   });
@@ -196,6 +255,13 @@ export const adminListDraft = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<SignedPortfolioMediaRow[]>({
+        op: "list",
+        token: data.token,
+        slug: data.slug,
+      });
+    }
     let rows = await readMediaRows(data.slug, "draft");
     if (rows.length === 0 && !hasServiceRoleKey() && !hasPostgresConfig()) {
       rows = await readMediaRows(data.slug, "published");
@@ -212,7 +278,15 @@ export const adminCreateSignedUpload = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
     if (!hasServiceRoleKey()) {
-      throw new Error("Upload indisponível: SUPABASE_SERVICE_ROLE_KEY não está configurada.");
+      if (canCallPortfolioAdminEdge()) {
+        return callPortfolioAdminEdge<{ path: string; uploadUrl: string; uploadToken: string }>({
+          op: "createSignedUpload",
+          token: data.token,
+          slug: data.slug,
+          ext: data.ext,
+        });
+      }
+      throw new Error("Upload indisponível: backend de portfólios não configurado.");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const uuid = crypto.randomUUID();
@@ -246,6 +320,9 @@ export const adminInsertMedia = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<PortfolioMediaRow>({ op: "insertMedia", ...data });
+    }
     if (!hasServiceRoleKey()) {
       return withPortfolioDb(async (client) => {
         await client.query("BEGIN");
@@ -352,6 +429,9 @@ export const adminUpdateMedia = createServerFn({ method: "POST" })
     if (data.alt !== undefined) patch.alt = data.alt;
     if (data.ordem !== undefined) patch.ordem = data.ordem;
     if (Object.keys(patch).length === 0) return { ok: true };
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<{ ok: true }>({ op: "updateMedia", ...data });
+    }
     if (!hasServiceRoleKey()) {
       await withPortfolioDb(async (client) => {
         await client.query(
@@ -378,6 +458,13 @@ export const adminReorderMedia = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<{ ok: true }>({
+        op: "reorderMedia",
+        token: data.token,
+        ids: data.ids,
+      });
+    }
     if (!hasServiceRoleKey()) {
       await withPortfolioDb(async (client) => {
         await client.query("BEGIN");
@@ -412,6 +499,9 @@ export const adminDeleteMedia = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<{ ok: true }>({ op: "deleteMedia", token: data.token, id: data.id });
+    }
     if (!hasServiceRoleKey()) {
       await withPortfolioDb(async (client) => {
         await client.query("DELETE FROM public.portfolio_media WHERE id = $1", [data.id]);
@@ -439,6 +529,13 @@ export const adminPublishSlug = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     if (!verifyAdmin(data.token)) throw new Error("Unauthorized");
+    if (!hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<{ ok: true; count: number }>({
+        op: "publishSlug",
+        token: data.token,
+        slug: data.slug,
+      });
+    }
     if (!hasServiceRoleKey()) {
       return withPortfolioDb(async (client) => {
         await client.query("BEGIN");
