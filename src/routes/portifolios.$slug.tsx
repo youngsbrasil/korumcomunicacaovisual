@@ -676,8 +676,29 @@ function PortfolioModelPage() {
     }
   };
 
+  const deckRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = deckRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const els = root.querySelectorAll<HTMLElement>(".reveal, .reveal-zoom");
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.15, rootMargin: "-5% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [media.length]);
+
   return (
     <div
+      ref={deckRef}
       className="deck min-h-[100dvh] w-full snap-y snap-mandatory overflow-y-auto bg-korum-navy-deep"
       style={{ scrollSnapType: "y mandatory" }}
     >
