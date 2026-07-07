@@ -1,7 +1,44 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { FileDown, Mail, MessageCircle, Phone, Share2 } from "lucide-react";
+import {
+  Building2,
+  Store,
+  Briefcase,
+  CalendarDays,
+  Eye,
+  Fuel,
+  ShoppingCart,
+  Smartphone,
+  Headset,
+  Plus,
+  MapPin,
+  Ruler,
+  Boxes,
+  Layers,
+  Cpu,
+  Monitor,
+  Radio,
+  Tag,
+  Package,
+  Trash2,
+  Droplet,
+  Wrench,
+  CalendarClock,
+  Link2,
+  Megaphone,
+  LayoutGrid,
+  Palette,
+  Sparkles,
+  Sticker,
+  Signpost,
+  FileDown,
+  Mail,
+  MessageCircle,
+  Phone,
+  Share2,
+  type LucideIcon,
+} from "lucide-react";
 import { useState } from "react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
@@ -92,6 +129,45 @@ type MediaItem = {
   caption: string | null;
   signedUrl: string;
 };
+
+const CHIP_ICON_RULES: Array<{ re: RegExp; icon: LucideIcon }> = [
+  { re: /fachada/i, icon: Building2 },
+  { re: /vitrine|loja/i, icon: Store },
+  { re: /corporativ|escritóri/i, icon: Briefcase },
+  { re: /evento|feira/i, icon: CalendarDays },
+  { re: /tráfego|publicidade/i, icon: Eye },
+  { re: /posto|combust/i, icon: Fuel },
+  { re: /supermercad|hortifrut|adega/i, icon: ShoppingCart },
+  { re: /app|web|celular|monitor/i, icon: Smartphone },
+  { re: /suporte|atendimento/i, icon: Headset },
+  { re: /nacional|mapa/i, icon: MapPin },
+  { re: /cruz/i, icon: Plus },
+  { re: /p2|p3|p4|p5|pixel|mm/i, icon: Ruler },
+  { re: /3d/i, icon: Layers },
+  { re: /poster|display/i, icon: Monitor },
+  { re: /coluna/i, icon: Boxes },
+  { re: /totem/i, icon: Signpost },
+  { re: /painel|telão|led/i, icon: Radio },
+  { re: /precificad|preço|anp/i, icon: Tag },
+  { re: /kit|trilho|mobiliári/i, icon: Package },
+  { re: /lixeira/i, icon: Trash2 },
+  { re: /óleo|calibrad/i, icon: Droplet },
+  { re: /caixa/i, icon: LayoutGrid },
+  { re: /campanha|agendamento|integração|crm/i, icon: CalendarClock },
+  { re: /controle/i, icon: Cpu },
+  { re: /acm/i, icon: Layers },
+  { re: /letra caixa/i, icon: Sparkles },
+  { re: /adesiv/i, icon: Sticker },
+  { re: /setor|gôndola|categoria|balcão|farmac|oferta|promocional/i, icon: Megaphone },
+  { re: /projeto|engenharia|acabamento|garantia|instala/i, icon: Wrench },
+  { re: /identidade|padroniz|estética/i, icon: Palette },
+  { re: /integração/i, icon: Link2 },
+];
+
+function iconForChip(chip: string): LucideIcon | null {
+  for (const rule of CHIP_ICON_RULES) if (rule.re.test(chip)) return rule.icon;
+  return null;
+}
 
 function youtubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
@@ -280,23 +356,27 @@ function PortfolioModelPage() {
             </div>
             {section.chips.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">
-                {section.chips.map((chip, ci) => (
-                  <span
-                    key={chip}
-                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium"
-                    style={
-                      ci === 0
-                        ? { backgroundColor: "#A6C939", color: "#182338" }
-                        : {
-                            backgroundColor: "#0f1626",
-                            border: "1px solid #33455F",
-                            color: "#C6CEDB",
-                          }
-                    }
-                  >
-                    {chip}
-                  </span>
-                ))}
+                {section.chips.map((chip, ci) => {
+                  const Icon = iconForChip(chip);
+                  return (
+                    <span
+                      key={chip}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                      style={
+                        ci === 0
+                          ? { backgroundColor: "#A6C939", color: "#182338" }
+                          : {
+                              backgroundColor: "#0f1626",
+                              border: "1px solid #33455F",
+                              color: "#C6CEDB",
+                            }
+                      }
+                    >
+                      {Icon && <Icon size={14} strokeWidth={1.75} aria-hidden />}
+                      {chip}
+                    </span>
+                  );
+                })}
               </div>
             )}
             {items.length === 0 && (
