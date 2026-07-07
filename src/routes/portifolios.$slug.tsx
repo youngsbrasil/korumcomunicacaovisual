@@ -927,6 +927,10 @@ function PortfolioModelPage() {
 
       <FloatingWhatsApp message={waMessage} />
 
+      <div className="w-full bg-korum-navy px-4 py-6">
+        <SiteSignature />
+      </div>
+
       {/* PDF-only actions slide: rendered off-screen, captured during PDF export */}
       <div
         data-pdf-actions
