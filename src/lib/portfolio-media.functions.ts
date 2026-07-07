@@ -249,6 +249,15 @@ export const getMediaForView = createServerFn({ method: "POST" })
         slug: data.slug,
       });
     }
+    // Public view: if we can't sign storage URLs locally (no service role /
+    // no direct DB), delegate to the edge function which has the service role
+    // and can produce proper signed URLs for private-bucket assets.
+    if (!data.preview && !hasServiceRoleKey() && !hasPostgresConfig() && canCallPortfolioAdminEdge()) {
+      return callPortfolioAdminEdge<SignedPortfolioMediaRow[]>({
+        op: "listPublished",
+        slug: data.slug,
+      });
+    }
     const rows = await readMediaRows(data.slug, status);
     return signUrls(rows);
   });
