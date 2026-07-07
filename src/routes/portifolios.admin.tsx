@@ -140,6 +140,9 @@ function AdminPage() {
           {submitting ? "Entrando…" : "Entrar"}
         </button>
       </form>
+      <div className="absolute bottom-6 left-0 right-0 px-4">
+        <SiteSignature />
+      </div>
     </div>
   );
 }
