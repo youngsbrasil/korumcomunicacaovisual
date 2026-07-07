@@ -700,6 +700,7 @@ function PortfolioModelPage() {
       }
 
       if (floating) floating.style.display = prevDisplay;
+      deckEl?.classList.remove("pdf-capturing");
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
       console.error(err);
