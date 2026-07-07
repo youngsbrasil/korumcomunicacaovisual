@@ -439,7 +439,7 @@ function ImpactSlide({ accent }: { accent: string }) {
             </div>
           </div>
         </div>
-        <LedTexture className="h-4 w-full opacity-70" color={accent} />
+        <LedTexture className="led-pulse h-4 w-full" color={accent} />
         <SlideFooter page="impacto" />
       </div>
     </Slide>
@@ -820,7 +820,7 @@ function PortfolioModelPage() {
               </a>
             </div>
           </div>
-          <LedTexture className="h-6 w-full opacity-60" color={model.accent} />
+          <LedTexture className="led-pulse h-6 w-full" color={model.accent} />
         </div>
       </Slide>
 
@@ -917,7 +917,7 @@ function PortfolioModelPage() {
             </div>
             <div className="flex flex-col items-center gap-4">
               <KorumLogo className="h-16 w-auto" />
-              <LedTexture className="h-6 w-full opacity-60" color="#A6C939" />
+              <LedTexture className="led-pulse h-6 w-full" color="#A6C939" />
             </div>
           </div>
         </div>
