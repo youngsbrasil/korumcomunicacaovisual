@@ -104,7 +104,6 @@ function MediaRenderer({ item }: { item: MediaItem }) {
       <img
         src={item.signedUrl}
         alt={item.caption ?? ""}
-        crossOrigin="anonymous"
         className="w-full h-full object-cover"
         loading="lazy"
       />
