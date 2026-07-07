@@ -619,6 +619,65 @@ function PortfolioModelPage() {
 
 
       <FloatingWhatsApp message={waMessage} />
+
+      {/* PDF-only actions slide: rendered off-screen, captured during PDF export */}
+      <div
+        data-pdf-actions
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: "-100000px",
+          top: 0,
+          pointerEvents: "none",
+          width: "540px",
+        }}
+      >
+        <div
+          data-slide
+          data-slide-bg="#182338"
+          data-slide-role="actions-pdf"
+          className="slide relative overflow-hidden rounded-2xl"
+          style={{ width: "540px", height: "960px", backgroundColor: "#182338", color: "#EFF1F3" }}
+        >
+          <div className="flex h-full w-full flex-col">
+            <BrandBlocks />
+            <div className="flex flex-1 flex-col justify-center px-8 py-10">
+              <EyebrowTag>{"<"}fale com a gente{">"}</EyebrowTag>
+              <h2
+                className="font-brand-heavy mt-4 leading-tight tracking-normal"
+                style={{ fontSize: "2.4rem", color: "#EFF1F3" }}
+              >
+                Vamos tirar seu projeto <span style={{ color: "#A6C939" }}>do papel?</span>
+              </h2>
+              <p className="mt-4 text-base" style={{ color: "#C6CEDB" }}>
+                Toque no botão abaixo para falar direto com o nosso time comercial no WhatsApp.
+              </p>
+
+              <div className="mt-10 flex flex-col items-center gap-4">
+                <div
+                  data-pdf-cta
+                  className="flex w-full items-center justify-center rounded-2xl px-6 py-6 text-center font-bold"
+                  style={{
+                    backgroundColor: "#A6C939",
+                    color: "#182338",
+                    fontSize: "1.35rem",
+                    boxShadow: "0 12px 30px rgba(166,201,57,0.35)",
+                  }}
+                >
+                  Falar com o comercial agora
+                </div>
+                <div
+                  className="text-center"
+                  style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.85)", fontSize: "0.95rem" }}
+                >
+                  ou ligue: (11) 9 1774-8504
+                </div>
+              </div>
+            </div>
+            <SlideFooter />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
