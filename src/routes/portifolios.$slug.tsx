@@ -706,6 +706,7 @@ function PortfolioModelPage() {
       console.error(err);
       alert("Não foi possível gerar o PDF neste navegador. Tente pelo Google Chrome.");
     } finally {
+      document.querySelector<HTMLElement>(".deck")?.classList.remove("pdf-capturing");
       setPdfLoading(false);
     }
   };
