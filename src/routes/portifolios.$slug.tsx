@@ -427,7 +427,7 @@ function PortfolioModelPage() {
       </Slide>
 
       {/* Section slides */}
-      {model.sections.flatMap((section, index) => sectionSlides(section, index))}
+      {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
       {/* Actions slide */}
       <Slide bg="navy">
