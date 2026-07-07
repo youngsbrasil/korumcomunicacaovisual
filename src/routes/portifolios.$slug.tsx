@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useInView } from "framer-motion";
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { useEffect, useRef, useState } from "react";
-
+import {
   Building2,
   Store,
   Briefcase,
@@ -40,9 +40,12 @@ import { useEffect, useRef, useState } from "react";
   MessageCircle,
   Phone,
   Share2,
+  TrendingUp,
+  Users,
+  Clock,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
