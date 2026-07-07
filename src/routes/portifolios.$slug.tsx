@@ -299,6 +299,128 @@ function SlideFooter({ page }: { page?: string }) {
   );
 }
 
+function AnimatedNumber({ value, suffix = "", prefix = "", duration = 1400 }: { value: number; suffix?: string; prefix?: string; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-10%" });
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return setDisplay(value);
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(Math.round(value * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, value, duration]);
+  return (
+    <span ref={ref}>
+      {prefix}
+      {display}
+      {suffix}
+    </span>
+  );
+}
+
+function ImpactSlide({ accent }: { accent: string }) {
+  const metrics: Array<{ icon: LucideIcon; prefix?: string; value: number; suffix: string; label: string }> = [
+    { icon: TrendingUp, prefix: "+", value: 400, suffix: "%", label: "de visibilidade da marca na fachada" },
+    { icon: Users, prefix: "+", value: 30, suffix: "%", label: "de atração de novos clientes na loja física" },
+    { icon: Clock, value: 24, suffix: "h", label: "de comunicação ativa, dia e noite" },
+    { icon: Zap, value: 3, suffix: "s", label: "para captar a atenção de quem passa" },
+  ];
+  const chartData = [
+    { name: "Sem CV", v: 22, fill: "#33455F" },
+    { name: "Com CV Korum", v: 92, fill: "#A6C939" },
+  ];
+  return (
+    <Slide>
+      <div className="flex h-full w-full flex-col">
+        <BrandBlocks />
+        <div className="flex flex-1 flex-col px-8 py-9 md:px-10">
+          <EyebrowTag>impacto · comunicação visual</EyebrowTag>
+          <h2
+            className="font-brand-heavy mt-4 leading-[1.05] tracking-tight"
+            style={{ fontSize: "clamp(1.6rem, 5.8vw, 2.4rem)", color: "#EFF1F3" }}
+          >
+            O que a comunicação visual{" "}
+            <span style={{ color: "#A6C939" }}>faz pelo seu negócio</span>
+          </h2>
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            {metrics.map((m) => {
+              const Icon = m.icon;
+              return (
+                <motion.div
+                  key={m.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ duration: 0.5 }}
+                  className="rounded-2xl p-4"
+                  style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}
+                >
+                  <Icon size={18} strokeWidth={1.75} color="#A6C939" aria-hidden />
+                  <div
+                    className="font-brand-heavy mt-2 leading-none"
+                    style={{ fontSize: "clamp(1.6rem, 6.5vw, 2.2rem)", color: "#A6C939" }}
+                  >
+                    <AnimatedNumber prefix={m.prefix} value={m.value} suffix={m.suffix} />
+                  </div>
+                  <div className="mt-1.5 text-[11px] leading-snug md:text-xs" style={{ color: "#C6CEDB" }}>
+                    {m.label}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex-1 rounded-2xl p-4" style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}>
+            <div
+              className="mb-2 text-[11px] uppercase tracking-[0.16em]"
+              style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.7)" }}
+            >
+              atenção captada · loja sem × com Korum
+            </div>
+            <div className="h-[110px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 24, left: 0, bottom: 0 }}>
+                  <XAxis type="number" domain={[0, 100]} hide />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#C6CEDB", fontSize: 11, fontFamily: "Space Mono, monospace" }}
+                    width={110}
+                  />
+                  <Bar dataKey="v" radius={[6, 6, 6, 6]} background={{ fill: "#182338" }} animationDuration={1200}>
+                    {chartData.map((d) => (
+                      <Cell key={d.name} fill={d.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-1 text-[10px]" style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.5)" }}>
+              * estimativa de impacto visual baseada em benchmarks de varejo · pode variar por região e segmento
+            </div>
+          </div>
+        </div>
+        <LedTexture className="h-4 w-full opacity-70" color={accent} />
+        <SlideFooter page="impacto" />
+      </div>
+    </Slide>
+  );
+}
+
+
+
 function PortfolioModelPage() {
   const { model } = Route.useLoaderData();
   const search = useSearch({ from: "/portifolios/$slug" });
