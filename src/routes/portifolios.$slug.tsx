@@ -554,7 +554,7 @@ function PortfolioModelPage() {
             >
               {chunk.map((item) => (
                 <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#182338" }}>
-                  <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden">
+                  <div className="reveal-zoom flex flex-1 min-h-0 items-center justify-center overflow-hidden">
                     <MediaRenderer item={item} />
                   </div>
                   {item.caption && (
