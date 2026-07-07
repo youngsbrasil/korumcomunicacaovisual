@@ -11,6 +11,7 @@ import {
   adminDeleteMedia,
   adminInsertMedia,
   adminListDraft,
+  adminMigrateL5eAssets,
   adminPublishSlug,
   adminReorderMedia,
   adminUpdateMedia,
