@@ -874,7 +874,7 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <Phone className="h-4 w-4" /> Entrar em contato agora
