@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, ExternalLink, Loader2, Trash2, Upload, X } from "lucide-react";
 
 import { KorumLogo } from "@/components/brand/KorumLogo";
+import { SiteSignature } from "@/components/brand/SiteSignature";
 import { adminLogin, adminVerify } from "@/lib/admin-auth.functions";
 import {
   adminCreateSignedUpload,
