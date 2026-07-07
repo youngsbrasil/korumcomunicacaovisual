@@ -8,7 +8,7 @@ import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
 import { KorumLogo } from "@/components/brand/KorumLogo";
 import { LedTexture } from "@/components/brand/LedTexture";
-import { TopBlocks } from "@/components/brand/TopBlocks";
+
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
 import type { PortfolioSection } from "@/data/models";
 import { getMediaForView } from "@/lib/portfolio-media.functions";
@@ -142,34 +142,63 @@ function parseSubtitle(text: string) {
   return { first: matches[1], second: matches[2] };
 }
 
-/** Slide frame: fixed 9:16, centered, snap target. */
+/** Slide frame: fixed 9:16, centered, snap target. Dark theme. */
 function Slide({
-  bg,
+  bg = "navy",
   children,
 }: {
-  bg: "navy" | "paper" | "navy-deep";
+  bg?: "navy" | "navy-deep";
   children: React.ReactNode;
 }) {
-  const bgClass =
-    bg === "navy"
-      ? "bg-korum-navy text-korum-paper"
-      : bg === "navy-deep"
-      ? "bg-korum-navy-deep text-korum-paper"
-      : "bg-korum-paper text-korum-navy";
-  const bgColor = bg === "navy" ? "#182338" : bg === "navy-deep" ? "#0f1626" : "#f4efe6";
+  const bgColor = bg === "navy-deep" ? "#0f1626" : "#182338";
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center snap-start py-4">
       <div
         data-slide
         data-slide-bg={bgColor}
-        className={`slide relative overflow-hidden rounded-2xl shadow-2xl ${bgClass}`}
+        className="slide relative overflow-hidden rounded-2xl shadow-2xl"
         style={{
           width: "min(calc(100vw - 24px), calc((100dvh - 32px) * 9 / 16))",
           aspectRatio: "9 / 16",
+          backgroundColor: bgColor,
+          color: "#EFF1F3",
         }}
       >
         {children}
       </div>
+    </div>
+  );
+}
+
+/** Slim brand block bar (Korum identity). */
+function BrandBlocks() {
+  return (
+    <div className="flex h-1.5 w-full shrink-0" aria-hidden>
+      <div className="flex-1" style={{ backgroundColor: "#A6C939" }} />
+      <div className="w-1/3" style={{ backgroundColor: "#0f1626" }} />
+      <div className="w-6" style={{ backgroundColor: "#A6C939" }} />
+    </div>
+  );
+}
+
+/** Small footer signature: little Korum mark + wordmark. */
+function SlideFooter({ page }: { page?: string }) {
+  return (
+    <div
+      className="flex shrink-0 items-center justify-between px-5 py-2.5"
+      style={{ borderTop: "1px solid rgba(198,206,219,0.10)" }}
+    >
+      <div className="flex items-center gap-2">
+        <KorumLogo className="h-4 w-auto opacity-90" />
+      </div>
+      {page && (
+        <span
+          className="text-[10px] tracking-widest"
+          style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.55)" }}
+        >
+          {page}
+        </span>
+      )}
     </div>
   );
 }
@@ -200,81 +229,108 @@ function PortfolioModelPage() {
   const hero = media.find((m) => m.section_id === "__hero");
   const mediaBySection = (id: string) => media.filter((m) => m.section_id === id);
 
-  // Chunk a section into slides: 1 text slide + N media slides (2 per slide).
+  // Chunk a section into slides: 1 text slide + N media slides.
+  // 1 media = full-bleed hero image; 2 medias = stacked full-bleed.
   const sectionSlides = (section: PortfolioSection, index: number) => {
     const items = mediaBySection(section.id);
     const number = String(index + 1).padStart(2, "0");
     const mediaChunks: MediaItem[][] = [];
     for (let i = 0; i < items.length; i += 2) mediaChunks.push(items.slice(i, i + 2));
-    const totalParts = 1 + mediaChunks.length; // text + media pages
+    const totalParts = 1 + mediaChunks.length;
     const parts: React.ReactNode[] = [];
 
     parts.push(
-      <Slide bg="paper" key={`${section.id}-text`}>
-        <div className="flex h-full w-full flex-col justify-center px-6 py-8">
-          <EyebrowTag>
-            {number} · {section.eyebrow}
-            {totalParts > 1 ? ` · 1/${totalParts}` : ""}
-          </EyebrowTag>
-          <h2
-            className="font-brand-heavy mt-3 leading-tight tracking-normal text-korum-navy"
-            style={{ fontSize: "clamp(1.6rem, 6vw, 2.4rem)" }}
-          >
-            {section.title}
-          </h2>
-          <div className="mt-4 space-y-3 text-sm leading-relaxed text-korum-paper-muted md:text-base">
-            {section.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
-          {section.chips.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {section.chips.map((chip, ci) => (
-                <span
-                  key={chip}
-                  className={
-                    ci === 0
-                      ? "inline-flex items-center rounded-full bg-korum-navy px-3 py-1.5 text-xs font-medium text-korum-paper"
-                      : "inline-flex items-center rounded-full border border-korum-navy/30 px-3 py-1.5 text-xs font-medium text-korum-navy"
-                  }
-                >
-                  {chip}
-                </span>
+      <Slide key={`${section.id}-text`}>
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-center px-6 py-8">
+            <EyebrowTag>
+              {number} · {section.eyebrow}
+              {totalParts > 1 ? ` · 1/${totalParts}` : ""}
+            </EyebrowTag>
+            <h2
+              className="font-brand-heavy mt-3 leading-tight tracking-normal"
+              style={{ fontSize: "clamp(1.6rem, 6vw, 2.4rem)", color: "#EFF1F3" }}
+            >
+              {section.title}
+            </h2>
+            <div
+              className="mt-4 space-y-3 text-sm leading-relaxed md:text-base"
+              style={{ color: "#C6CEDB" }}
+            >
+              {section.body.map((p) => (
+                <p key={p}>{p}</p>
               ))}
             </div>
-          )}
-          {items.length === 0 && (
-            <div className="mt-6 flex flex-1 items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-8 text-center text-korum-navy/55">
-              <span className="font-mono text-xs">Fotos e vídeos entram pelo painel</span>
-            </div>
-          )}
+            {section.chips.length > 0 && (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {section.chips.map((chip, ci) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium"
+                    style={
+                      ci === 0
+                        ? { backgroundColor: "#A6C939", color: "#182338" }
+                        : {
+                            backgroundColor: "#0f1626",
+                            border: "1px solid #33455F",
+                            color: "#C6CEDB",
+                          }
+                    }
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            )}
+            {items.length === 0 && (
+              <div
+                className="mt-6 flex flex-1 items-center justify-center rounded-2xl px-4 py-8 text-center"
+                style={{ border: "2px dashed rgba(198,206,219,0.25)", color: "rgba(198,206,219,0.55)" }}
+              >
+                <span className="font-mono text-xs">Fotos e vídeos entram pelo painel</span>
+              </div>
+            )}
+          </div>
+          <SlideFooter page={`${number} / ${section.eyebrow}`} />
         </div>
       </Slide>,
     );
 
     mediaChunks.forEach((chunk, ci) => {
+      const singleImage = chunk.length === 1;
       parts.push(
-        <Slide bg="paper" key={`${section.id}-media-${ci}`}>
-          <div className="flex h-full w-full flex-col px-6 py-8">
-            <EyebrowTag>
-              {number} · {section.eyebrow} · {ci + 2}/{totalParts}
-            </EyebrowTag>
-            <h3
-              className="font-brand-heavy mt-2 leading-tight tracking-normal text-korum-navy"
-              style={{ fontSize: "clamp(1.1rem, 4vw, 1.4rem)" }}
+        <Slide key={`${section.id}-media-${ci}`}>
+          <div className="flex h-full w-full flex-col">
+            <BrandBlocks />
+            <div className="px-6 pt-6 pb-3">
+              <EyebrowTag>
+                {number} · {section.eyebrow} · {ci + 2}/{totalParts}
+              </EyebrowTag>
+              <h3
+                className="font-brand-heavy mt-2 leading-tight tracking-normal"
+                style={{ fontSize: "clamp(1.05rem, 3.8vw, 1.35rem)", color: "#EFF1F3" }}
+              >
+                {section.title}
+              </h3>
+            </div>
+            <div
+              className={`flex flex-1 flex-col ${singleImage ? "" : "gap-1"}`}
+              style={{ minHeight: 0 }}
             >
-              {section.title}
-            </h3>
-            <div className="mt-4 grid flex-1 grid-cols-1 gap-3">
               {chunk.map((item) => (
-                <figure key={item.id} className="overflow-hidden rounded-xl bg-black min-h-0">
-                  <div className="h-full w-full">
+                <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#000" }}>
+                  <div className="flex-1 min-h-0 overflow-hidden">
                     <MediaRenderer item={item} />
                   </div>
                   {item.caption && (
                     <figcaption
-                      className="px-3 py-1.5 text-xs text-korum-navy/70 bg-korum-paper"
-                      style={{ fontFamily: "Space Mono, monospace" }}
+                      className="px-5 py-1.5 text-[11px]"
+                      style={{
+                        fontFamily: "Space Mono, monospace",
+                        color: "#C6CEDB",
+                        backgroundColor: "#0f1626",
+                      }}
                     >
                       {item.caption}
                     </figcaption>
@@ -282,6 +338,7 @@ function PortfolioModelPage() {
                 </figure>
               ))}
             </div>
+            <SlideFooter page={`${number} / ${section.eyebrow}`} />
           </div>
         </Slide>,
       );
@@ -289,6 +346,7 @@ function PortfolioModelPage() {
 
     return parts;
   };
+
 
   const handleGeneratePdf = async () => {
     if (pdfLoading) return;
@@ -371,48 +429,64 @@ function PortfolioModelPage() {
       style={{ scrollSnapType: "y mandatory" }}
     >
       {/* Slide 1: Hero */}
-      <Slide bg="navy">
+      <Slide>
         <div className="flex h-full w-full flex-col">
-          <TopBlocks />
-          <div className="flex items-center justify-between px-5 py-4">
+          <BrandBlocks />
+          <div className="flex items-center justify-between px-5 py-3">
             <Link to="/portifolios">
-              <KorumLogo className="h-8 w-auto" />
+              <KorumLogo className="h-7 w-auto" />
             </Link>
+            <span
+              className="text-[10px] tracking-widest uppercase"
+              style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.55)" }}
+            >
+              portfólio · {model.eyebrow}
+            </span>
           </div>
 
-          <div className="flex flex-1 flex-col justify-center gap-4 px-5 pb-6">
-            <div className="relative">
-              <div
-                className="relative overflow-hidden rounded-2xl border-4"
-                style={{ borderColor: model.accent, aspectRatio: "4 / 3" }}
-              >
-                {hero ? (
-                  <MediaRenderer item={hero} />
-                ) : (
-                  <>
-                    <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span
-                        className="font-brand-heavy select-none text-korum-paper"
-                        style={{ fontSize: "clamp(3rem, 18vw, 6rem)", textShadow: `0 0 40px ${model.accent}` }}
-                      >
-                        {model.name.slice(0, 3).toUpperCase()}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+          {/* Full-bleed hero image with accent glow */}
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              aspectRatio: "4 / 5",
+              backgroundColor: "#000",
+              borderTop: `3px solid ${model.accent}`,
+              borderBottom: `3px solid ${model.accent}`,
+              boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.04)`,
+            }}
+          >
+            {hero ? (
+              <MediaRenderer item={hero} />
+            ) : (
+              <>
+                <LedTexture className="absolute inset-0 opacity-70" color={model.accent} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span
+                    className="font-brand-heavy select-none"
+                    style={{
+                      fontSize: "clamp(3rem, 18vw, 6rem)",
+                      color: "#EFF1F3",
+                      textShadow: `0 0 40px ${model.accent}`,
+                    }}
+                  >
+                    {model.name.slice(0, 3).toUpperCase()}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
 
-            <div className="font-mono text-xs text-korum-paper/90">
+          <div className="flex flex-1 flex-col justify-center gap-3 px-5 py-5">
+            <div className="font-mono text-xs" style={{ color: "rgba(239,241,243,0.9)" }}>
               <div>{sub.first}</div>
-              <div className="text-korum-green">{sub.second}</div>
+              <div style={{ color: "#A6C939" }}>{sub.second}</div>
             </div>
             <h1
-              className="font-brand-heavy leading-none tracking-normal text-korum-paper"
-              style={{ fontSize: "clamp(1.6rem, 7vw, 2.6rem)" }}
+              className="font-brand-heavy leading-none tracking-normal"
+              style={{ fontSize: "clamp(1.6rem, 7vw, 2.6rem)", color: "#EFF1F3" }}
             >
-              {model.heroTitle} <span className="text-korum-green">{model.heroTitleEm}</span>
+              {model.heroTitle}{" "}
+              <span style={{ color: "#A6C939" }}>{model.heroTitleEm}</span>
             </h1>
 
             <div className="flex flex-wrap gap-2 pt-1">
@@ -420,98 +494,123 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-korum-green px-4 py-2.5 text-sm font-bold text-korum-paper transition-opacity hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <MessageCircle className="h-4 w-4" /> Pedir orçamento
               </a>
               <a
                 href={`#${model.sections[0]?.id ?? ""}`}
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-korum-paper/40 px-4 py-2.5 text-sm font-bold text-korum-paper transition-colors hover:border-korum-paper"
+                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+                style={{
+                  border: "2px solid rgba(239,241,243,0.4)",
+                  color: "#EFF1F3",
+                }}
               >
                 Ver soluções
               </a>
             </div>
           </div>
+          <LedTexture className="h-6 w-full opacity-60" color={model.accent} />
         </div>
       </Slide>
+
 
       {/* Section slides */}
       {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
       {/* Actions slide */}
-      <Slide bg="navy">
-        <div className="flex h-full w-full flex-col justify-center px-6 py-8">
-          <EyebrowTag>ações</EyebrowTag>
-          <h2
-            className="font-brand-heavy mt-3 leading-tight tracking-normal"
-            style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)" }}
-          >
-            Gostou? Leve com você
-          </h2>
+      <Slide>
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-center px-6 py-8">
+            <EyebrowTag>ações</EyebrowTag>
+            <h2
+              className="font-brand-heavy mt-3 leading-tight tracking-normal"
+              style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)", color: "#EFF1F3" }}
+            >
+              Gostou? <span style={{ color: "#A6C939" }}>Leve com você</span>
+            </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <button
-              type="button"
-              onClick={handleGeneratePdf}
-              disabled={pdfLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-4 py-3.5 text-sm font-bold text-korum-paper transition-opacity hover:opacity-90 disabled:opacity-70"
-            >
-              <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
-            </button>
-            <a
-              href={mailtoUrl}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-4 py-3.5 text-sm text-korum-paper transition-colors hover:bg-korum-paper/20"
-            >
-              <Mail className="h-4 w-4" /> Enviar por e-mail
-            </a>
-            <a
-              href={waShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-4 py-3.5 text-sm text-korum-paper transition-colors hover:bg-korum-paper/20"
-            >
-              <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
-            </a>
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-4 py-3.5 text-sm font-bold text-korum-paper transition-opacity hover:opacity-90"
-            >
-              <Phone className="h-4 w-4" /> Entrar em contato agora
-            </a>
+            <div className="mt-6 grid grid-cols-1 gap-3">
+              <button
+                type="button"
+                onClick={handleGeneratePdf}
+                disabled={pdfLoading}
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
+                style={{ backgroundColor: "#A6C939", color: "#182338" }}
+              >
+                <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
+              </button>
+              <a
+                href={mailtoUrl}
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
+              >
+                <Mail className="h-4 w-4" /> Enviar por e-mail
+              </a>
+              <a
+                href={waShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
+              >
+                <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
+              </a>
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#A6C939", color: "#182338" }}
+              >
+                <Phone className="h-4 w-4" /> Entrar em contato agora
+              </a>
+            </div>
           </div>
+          <SlideFooter />
         </div>
       </Slide>
 
       {/* Contact slide */}
       <Slide bg="navy-deep">
-        <div className="flex h-full w-full flex-col justify-between px-6 py-10">
-          <div>
-            <EyebrowTag>contato</EyebrowTag>
-            <h3
-              className="font-brand-heavy mt-4 leading-tight tracking-normal text-korum-paper"
-              style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)" }}
-            >
-              Prepare-se para o futuro
-            </h3>
-            <div className="mt-6 flex flex-col gap-3 font-mono text-sm text-korum-paper/80">
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-korum-paper"
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-between px-6 py-10">
+            <div>
+              <EyebrowTag>contato</EyebrowTag>
+              <h3
+                className="font-brand-heavy mt-4 leading-tight tracking-normal"
+                style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)", color: "#EFF1F3" }}
               >
-                <MessageCircle className="h-4 w-4" /> {WHATSAPP_DISPLAY}
-              </a>
-              <a href={`mailto:${EMAIL}`} className="hover:text-korum-paper break-all">
-                {EMAIL}
-              </a>
+                Prepare-se para o <span style={{ color: "#A6C939" }}>futuro</span>
+              </h3>
+              <div
+                className="mt-6 flex flex-col gap-3 font-mono text-sm"
+                style={{ color: "rgba(239,241,243,0.8)" }}
+              >
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2"
+                >
+                  <MessageCircle className="h-4 w-4" /> {WHATSAPP_DISPLAY}
+                </a>
+                <a href={`mailto:${EMAIL}`} className="break-all">
+                  {EMAIL}
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <KorumLogo className="h-16 w-auto" />
+              <LedTexture className="h-6 w-full opacity-60" color="#A6C939" />
             </div>
           </div>
-          <KorumLogo className="h-12 w-auto" />
         </div>
       </Slide>
+
 
       <FloatingWhatsApp message={waMessage} />
     </div>

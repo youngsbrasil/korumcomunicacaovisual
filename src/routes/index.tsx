@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { HardHat, MessageCircle, PanelsTopLeft, Wrench } from "lucide-react";
 
 import { VoxelScene } from "@/components/VoxelScene";
-import logoKorum from "@/assets/logo-korum.png";
+import logoKorum from "@/assets/logo-korum-bco.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,7 +40,7 @@ function Index() {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="mb-4 md:mb-6">
-        <img src={logoKorum} alt="Korum Comunicação Visual" className="h-12 w-auto md:h-16" />
+        <img src={logoKorum.url} alt="Korum Comunicação Visual" className="h-12 w-auto md:h-16" />
       </motion.div>
 
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.6 }} className="mb-6 w-full max-w-2xl md:mb-8">
