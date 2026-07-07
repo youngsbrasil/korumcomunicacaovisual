@@ -315,8 +315,8 @@ function PortfolioModelPage() {
         ),
       );
 
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
+      const [{ toJpeg }, { jsPDF }] = await Promise.all([
+        import("html-to-image"),
         import("jspdf"),
       ]);
 
@@ -333,18 +333,23 @@ function PortfolioModelPage() {
       for (let i = 0; i < slides.length; i++) {
         const slide = slides[i];
         const bg = slide.getAttribute("data-slide-bg") || "#ffffff";
-        const canvas = await html2canvas(slide, {
-          scale: 2,
-          useCORS: true,
+        const rect = slide.getBoundingClientRect();
+        const targetW = 540;
+        const scale = targetW / rect.width;
+        const imgData = await toJpeg(slide, {
+          quality: 0.94,
+          pixelRatio: 2,
           backgroundColor: bg,
-          logging: false,
-          windowWidth: slide.offsetWidth,
-          windowHeight: slide.offsetHeight,
+          cacheBust: true,
+          width: rect.width,
+          height: rect.height,
+          canvasWidth: targetW,
+          canvasHeight: Math.round(rect.height * scale),
         });
-        const imgData = canvas.toDataURL("image/jpeg", 0.94);
         if (i > 0) pdf.addPage([pdfWidthMM, pdfHeightMM], "portrait");
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfHeightMM, "", "NONE");
       }
+
 
       if (floating) floating.style.display = prevDisplay;
       pdf.save(`Korum-${model.slug}.pdf`);
