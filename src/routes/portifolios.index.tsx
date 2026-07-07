@@ -109,6 +109,9 @@ function PortfolioIndex() {
             <a href={`mailto:${EMAIL}`} className="hover:text-korum-paper">{EMAIL}</a>
           </div>
         </div>
+        <div className="mx-auto mt-6 max-w-6xl border-t border-korum-paper/10 pt-4">
+          <SiteSignature />
+        </div>
       </footer>
 
       <FloatingWhatsApp />
