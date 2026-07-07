@@ -354,7 +354,7 @@ function PortfolioModelPage() {
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfHeightMM, "", "NONE");
       }
 
-      console.log("[pdf] saving");
+      
       if (floating) floating.style.display = prevDisplay;
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
