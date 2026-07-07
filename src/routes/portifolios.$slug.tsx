@@ -356,23 +356,27 @@ function PortfolioModelPage() {
             </div>
             {section.chips.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">
-                {section.chips.map((chip, ci) => (
-                  <span
-                    key={chip}
-                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium"
-                    style={
-                      ci === 0
-                        ? { backgroundColor: "#A6C939", color: "#182338" }
-                        : {
-                            backgroundColor: "#0f1626",
-                            border: "1px solid #33455F",
-                            color: "#C6CEDB",
-                          }
-                    }
-                  >
-                    {chip}
-                  </span>
-                ))}
+                {section.chips.map((chip, ci) => {
+                  const Icon = iconForChip(chip);
+                  return (
+                    <span
+                      key={chip}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                      style={
+                        ci === 0
+                          ? { backgroundColor: "#A6C939", color: "#182338" }
+                          : {
+                              backgroundColor: "#0f1626",
+                              border: "1px solid #33455F",
+                              color: "#C6CEDB",
+                            }
+                      }
+                    >
+                      {Icon && <Icon size={14} strokeWidth={1.75} aria-hidden />}
+                      {chip}
+                    </span>
+                  );
+                })}
               </div>
             )}
             {items.length === 0 && (
