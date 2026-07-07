@@ -353,17 +353,17 @@ function ImpactSlide({ accent }: { accent: string }) {
           </h2>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
-            {metrics.map((m) => {
+            {metrics.map((m, i) => {
               const Icon = m.icon;
               return (
-                <motion.div
+                <div
                   key={m.label}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-10%" }}
-                  transition={{ duration: 0.5 }}
-                  className="rounded-2xl p-4"
-                  style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}
+                  className="reveal rounded-2xl p-4"
+                  style={{
+                    backgroundColor: "#0f1626",
+                    border: "1px solid #263447",
+                    transitionDelay: `${120 + i * 90}ms`,
+                  }}
                 >
                   <Icon size={18} strokeWidth={1.75} color="#A6C939" aria-hidden />
                   <div
@@ -375,10 +375,11 @@ function ImpactSlide({ accent }: { accent: string }) {
                   <div className="mt-1.5 text-[11px] leading-snug md:text-xs" style={{ color: "#C6CEDB" }}>
                     {m.label}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
+
 
           <div className="mt-6 flex-1 rounded-2xl p-4" style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}>
             <div
