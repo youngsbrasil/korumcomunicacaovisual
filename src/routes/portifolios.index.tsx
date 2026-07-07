@@ -1,4 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { MessageCircle } from "lucide-react";
 
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
@@ -6,6 +8,7 @@ import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
 import { KorumLogo } from "@/components/brand/KorumLogo";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, models } from "@/data/models";
+import { getPublishedCovers } from "@/lib/portfolio-media.functions";
 
 export const Route = createFileRoute("/portifolios/")({
   head: () => ({
