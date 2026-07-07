@@ -213,6 +213,8 @@ function PortfolioModelPage() {
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+  const waCommercialMessage = `Olá! Vi o portfólio de ${model.name} e quero falar com o comercial.`;
+  const waCommercialUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waCommercialMessage)}`;
   const pageUrl = `${SITE_URL}/portifolios/${model.slug}`;
   const shareText = `${model.seo.title} ${pageUrl}`;
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
