@@ -10,6 +10,17 @@ import { SiteSignature } from "@/components/brand/SiteSignature";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, models } from "@/data/models";
 import { getPublishedCovers } from "@/lib/portfolio-media.functions";
+import coverLed from "@/assets/cover-led.jpg";
+import coverPostos from "@/assets/cover-postos.jpg";
+import coverFarmacias from "@/assets/cover-farmacias.jpg";
+import coverSupermercados from "@/assets/cover-supermercados.jpg";
+
+const fallbackCovers: Record<string, string> = {
+  led: coverLed,
+  postos: coverPostos,
+  farmacias: coverFarmacias,
+  supermercados: coverSupermercados,
+};
 
 export const Route = createFileRoute("/portifolios/")({
   head: () => ({
