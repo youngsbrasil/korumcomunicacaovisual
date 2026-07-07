@@ -627,6 +627,9 @@ function PortfolioModelPage() {
       const prevDisplay = floating?.style.display ?? "";
       if (floating) floating.style.display = "none";
 
+      // Force all reveal/animated elements to their final state during capture
+      deckEl?.classList.add("pdf-capturing");
+
       const captureSlides: HTMLElement[] = siteSlides.map((slide) =>
         slide.dataset.slideRole === "actions" && pdfActionsSlide ? pdfActionsSlide : slide,
       );
