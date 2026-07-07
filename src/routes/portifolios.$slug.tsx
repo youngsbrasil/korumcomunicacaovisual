@@ -335,27 +335,34 @@ function PortfolioModelPage() {
       <Slide key={`${section.id}-text`}>
         <div className="flex h-full w-full flex-col">
           <BrandBlocks />
-          <div className="flex flex-1 flex-col justify-center px-6 py-8">
+          <div className="flex flex-1 flex-col justify-center px-8 py-10 md:px-10">
             <EyebrowTag>
               {number} · {section.eyebrow}
               {totalParts > 1 ? ` · 1/${totalParts}` : ""}
             </EyebrowTag>
             <h2
-              className="font-brand-heavy mt-3 leading-tight tracking-normal"
-              style={{ fontSize: "clamp(1.6rem, 6vw, 2.4rem)", color: "#EFF1F3" }}
+              className="font-brand-heavy mt-5 leading-[1.05] tracking-tight"
+              style={{ fontSize: "clamp(1.9rem, 7vw, 2.9rem)", color: "#EFF1F3" }}
             >
               {section.title}
             </h2>
-            <div
-              className="mt-4 space-y-3 text-sm leading-relaxed md:text-base"
-              style={{ color: "#C6CEDB" }}
-            >
-              {section.body.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
+            <div className="mt-7 space-y-4 text-[15px] leading-relaxed md:text-base" style={{ color: "#C6CEDB" }}>
+              {section.body.map((p, pi) =>
+                pi === 0 ? (
+                  <p
+                    key={p}
+                    className="pl-4 text-[16px] font-medium leading-relaxed md:text-lg"
+                    style={{ borderLeft: "2px solid #A6C939", color: "#E8ECF2" }}
+                  >
+                    {p}
+                  </p>
+                ) : (
+                  <p key={p}>{p}</p>
+                ),
+              )}
             </div>
             {section.chips.length > 0 && (
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-7 flex flex-wrap gap-2">
                 {section.chips.map((chip, ci) => {
                   const Icon = iconForChip(chip);
                   return (
@@ -381,7 +388,7 @@ function PortfolioModelPage() {
             )}
             {items.length === 0 && (
               <div
-                className="mt-6 flex flex-1 items-center justify-center rounded-2xl px-4 py-8 text-center"
+                className="mt-8 flex items-center justify-center rounded-2xl px-4 py-8 text-center"
                 style={{ border: "2px dashed rgba(198,206,219,0.25)", color: "rgba(198,206,219,0.55)" }}
               >
                 <span className="font-mono text-xs">Fotos e vídeos entram pelo painel</span>
