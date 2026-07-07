@@ -524,7 +524,7 @@ function PortfolioModelPage() {
       {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
       {/* Actions slide */}
-      <Slide>
+      <Slide role="actions">
         <div className="flex h-full w-full flex-col">
           <BrandBlocks />
           <div className="flex flex-1 flex-col justify-center px-6 py-8">
