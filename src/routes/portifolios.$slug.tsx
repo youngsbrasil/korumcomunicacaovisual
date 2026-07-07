@@ -303,7 +303,7 @@ function PortfolioModelPage() {
 
       // Wait for images inside slides (with per-image timeout)
       const imgs = slides.flatMap((s) => Array.from(s.querySelectorAll("img")));
-      console.log("[pdf] images:", imgs.length);
+      
       await Promise.all(
         imgs.map(
           (img) =>
