@@ -484,10 +484,10 @@ function PortfolioModelPage() {
 
           {/* Full-bleed hero image with accent glow */}
           <div
-            className="relative w-full overflow-hidden"
+            className="relative flex w-full items-center justify-center overflow-hidden"
             style={{
               aspectRatio: "4 / 5",
-              backgroundColor: "#000",
+              backgroundColor: "#182338",
               borderTop: `3px solid ${model.accent}`,
               borderBottom: `3px solid ${model.accent}`,
               boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.04)`,
