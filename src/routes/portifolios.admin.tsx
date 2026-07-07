@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, ExternalLink, Loader2, Trash2, Upload, X } from "lucide-react";
 
 import { KorumLogo } from "@/components/brand/KorumLogo";
+import { SiteSignature } from "@/components/brand/SiteSignature";
 import { adminLogin, adminVerify } from "@/lib/admin-auth.functions";
 import {
   adminCreateSignedUpload,
@@ -106,7 +107,7 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper px-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper px-6">
       <form onSubmit={onSubmit} className="w-full max-w-sm flex flex-col items-center gap-6">
         <KorumLogo className="h-14 w-auto" />
         <div className="text-center">
@@ -139,6 +140,9 @@ function AdminPage() {
           {submitting ? "Entrando…" : "Entrar"}
         </button>
       </form>
+      <div className="absolute bottom-6 left-0 right-0 px-4">
+        <SiteSignature />
+      </div>
     </div>
   );
 }
@@ -452,6 +456,11 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
           );
         })}
       </div>
+
+      <div className="px-4 md:px-6 pt-8 pb-6">
+        <SiteSignature />
+      </div>
+
 
       {/* Bottom bar */}
       <div className="fixed bottom-0 inset-x-0 z-30 bg-korum-navy/95 backdrop-blur border-t border-white/10 px-4 py-3 flex gap-3 justify-end">
