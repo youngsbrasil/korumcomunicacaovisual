@@ -316,7 +316,7 @@ function PortfolioModelPage() {
             }),
         ),
       );
-      console.log("[pdf] images ready");
+      
 
       const [{ toJpeg }, { jsPDF }] = await Promise.all([
         import("html-to-image"),
