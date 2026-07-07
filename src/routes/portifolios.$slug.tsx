@@ -304,18 +304,22 @@ function PortfolioModelPage() {
       const prevDisplay = floating?.style.display ?? "";
       if (floating) floating.style.display = "none";
 
-      // Wait for images inside slides
+      // Wait for images inside slides (with per-image timeout)
       const imgs = slides.flatMap((s) => Array.from(s.querySelectorAll("img")));
+      console.log("[pdf] images:", imgs.length);
       await Promise.all(
         imgs.map(
           (img) =>
             new Promise<void>((resolve) => {
               if (img.complete && img.naturalWidth > 0) return resolve();
-              img.addEventListener("load", () => resolve(), { once: true });
-              img.addEventListener("error", () => resolve(), { once: true });
+              const done = () => resolve();
+              img.addEventListener("load", done, { once: true });
+              img.addEventListener("error", done, { once: true });
+              setTimeout(done, 4000);
             }),
         ),
       );
+      console.log("[pdf] images ready");
 
       const [{ toJpeg }, { jsPDF }] = await Promise.all([
         import("html-to-image"),
