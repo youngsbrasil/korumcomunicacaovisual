@@ -218,6 +218,71 @@
   }
 }
 
+/* --- Slide reveal animations (BLOCO C) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.55s ease-out,
+    transform 0.55s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.is-visible,
+.deck.pdf-capturing .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-zoom {
+  transform: scale(1.02);
+  transition: transform 1.2s ease-out;
+  will-change: transform;
+}
+.reveal-zoom.is-visible,
+.deck.pdf-capturing .reveal-zoom {
+  transform: scale(1);
+}
+
+.hover-lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+.hover-lift:active {
+  transform: translateY(0);
+}
+
+.led-pulse {
+  animation: ledPulse 2.8s ease-in-out infinite;
+}
+@keyframes ledPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-zoom {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .led-pulse {
+    animation: none !important;
+  }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

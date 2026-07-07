@@ -1,7 +1,6 @@
 import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { motion, useInView } from "framer-motion";
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -301,23 +300,50 @@ function SlideFooter({ page }: { page?: string }) {
 
 function AnimatedNumber({ value, suffix = "", prefix = "", duration = 1400 }: { value: number; suffix?: string; prefix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-10%" });
   const [display, setDisplay] = useState(0);
   useEffect(() => {
-    if (!inView) return;
+    const el = ref.current;
+    if (!el) return;
+    const isCapturing = () => !!el.closest(".deck.pdf-capturing");
     const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return setDisplay(value);
-    const start = performance.now();
+    if (isCapturing() || reduce) {
+      setDisplay(value);
+      return;
+    }
     let raf = 0;
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setDisplay(Math.round(value * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
+    let started = false;
+    const animate = () => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setDisplay(Math.round(value * eased));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, value, duration]);
+    if (typeof IntersectionObserver === "undefined") {
+      animate();
+      return () => cancelAnimationFrame(raf);
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !started) {
+            started = true;
+            animate();
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [value, duration]);
   return (
     <span ref={ref}>
       {prefix}
@@ -353,17 +379,17 @@ function ImpactSlide({ accent }: { accent: string }) {
           </h2>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
-            {metrics.map((m) => {
+            {metrics.map((m, i) => {
               const Icon = m.icon;
               return (
-                <motion.div
+                <div
                   key={m.label}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-10%" }}
-                  transition={{ duration: 0.5 }}
-                  className="rounded-2xl p-4"
-                  style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}
+                  className="reveal rounded-2xl p-4"
+                  style={{
+                    backgroundColor: "#0f1626",
+                    border: "1px solid #263447",
+                    transitionDelay: `${120 + i * 90}ms`,
+                  }}
                 >
                   <Icon size={18} strokeWidth={1.75} color="#A6C939" aria-hidden />
                   <div
@@ -375,10 +401,11 @@ function ImpactSlide({ accent }: { accent: string }) {
                   <div className="mt-1.5 text-[11px] leading-snug md:text-xs" style={{ color: "#C6CEDB" }}>
                     {m.label}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
+
 
           <div className="mt-6 flex-1 rounded-2xl p-4" style={{ backgroundColor: "#0f1626", border: "1px solid #263447" }}>
             <div
@@ -412,7 +439,7 @@ function ImpactSlide({ accent }: { accent: string }) {
             </div>
           </div>
         </div>
-        <LedTexture className="h-4 w-full opacity-70" color={accent} />
+        <LedTexture className="led-pulse h-4 w-full" color={accent} />
         <SlideFooter page="impacto" />
       </div>
     </Slide>
@@ -469,8 +496,8 @@ function PortfolioModelPage() {
               {totalParts > 1 ? ` · 1/${totalParts}` : ""}
             </EyebrowTag>
             <h2
-              className="font-brand-heavy mt-5 leading-[1.05] tracking-tight"
-              style={{ fontSize: "clamp(1.9rem, 7vw, 2.9rem)", color: "#EFF1F3" }}
+              className="reveal font-brand-heavy mt-5 leading-[1.05] tracking-tight"
+              style={{ fontSize: "clamp(1.9rem, 7vw, 2.9rem)", color: "#EFF1F3", transitionDelay: "60ms" }}
             >
               {section.title}
             </h2>
@@ -479,13 +506,15 @@ function PortfolioModelPage() {
                 pi === 0 ? (
                   <p
                     key={p}
-                    className="pl-4 text-[16px] font-medium leading-relaxed md:text-lg"
-                    style={{ borderLeft: "2px solid #A6C939", color: "#E8ECF2" }}
+                    className="reveal pl-4 text-[16px] font-medium leading-relaxed md:text-lg"
+                    style={{ borderLeft: "2px solid #A6C939", color: "#E8ECF2", transitionDelay: `${140 + pi * 80}ms` }}
                   >
                     {p}
                   </p>
                 ) : (
-                  <p key={p}>{p}</p>
+                  <p key={p} className="reveal" style={{ transitionDelay: `${140 + pi * 80}ms` }}>
+                    {p}
+                  </p>
                 ),
               )}
             </div>
@@ -496,14 +525,15 @@ function PortfolioModelPage() {
                   return (
                     <span
                       key={chip}
-                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                      className="reveal inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
                       style={
                         ci === 0
-                          ? { backgroundColor: "#A6C939", color: "#182338" }
+                          ? { backgroundColor: "#A6C939", color: "#182338", transitionDelay: `${280 + ci * 55}ms` }
                           : {
                               backgroundColor: "#0f1626",
                               border: "1px solid #33455F",
                               color: "#C6CEDB",
+                              transitionDelay: `${280 + ci * 55}ms`,
                             }
                       }
                     >
@@ -551,7 +581,7 @@ function PortfolioModelPage() {
             >
               {chunk.map((item) => (
                 <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#182338" }}>
-                  <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden">
+                  <div className="reveal-zoom flex flex-1 min-h-0 items-center justify-center overflow-hidden">
                     <MediaRenderer item={item} />
                   </div>
                   {item.caption && (
@@ -596,6 +626,9 @@ function PortfolioModelPage() {
       const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
       const prevDisplay = floating?.style.display ?? "";
       if (floating) floating.style.display = "none";
+
+      // Force all reveal/animated elements to their final state during capture
+      deckEl?.classList.add("pdf-capturing");
 
       const captureSlides: HTMLElement[] = siteSlides.map((slide) =>
         slide.dataset.slideRole === "actions" && pdfActionsSlide ? pdfActionsSlide : slide,
@@ -667,17 +700,40 @@ function PortfolioModelPage() {
       }
 
       if (floating) floating.style.display = prevDisplay;
+      deckEl?.classList.remove("pdf-capturing");
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
       console.error(err);
       alert("Não foi possível gerar o PDF neste navegador. Tente pelo Google Chrome.");
     } finally {
+      document.querySelector<HTMLElement>(".deck")?.classList.remove("pdf-capturing");
       setPdfLoading(false);
     }
   };
 
+  const deckRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = deckRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const els = root.querySelectorAll<HTMLElement>(".reveal, .reveal-zoom");
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.15, rootMargin: "-5% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [media.length]);
+
   return (
     <div
+      ref={deckRef}
       className="deck min-h-[100dvh] w-full snap-y snap-mandatory overflow-y-auto bg-korum-navy-deep"
       style={{ scrollSnapType: "y mandatory" }}
     >
@@ -747,7 +803,7 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90"
+                className="hover-lift inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <MessageCircle className="h-4 w-4" /> Pedir orçamento
@@ -764,7 +820,7 @@ function PortfolioModelPage() {
               </a>
             </div>
           </div>
-          <LedTexture className="h-6 w-full opacity-60" color={model.accent} />
+          <LedTexture className="led-pulse h-6 w-full" color={model.accent} />
         </div>
       </Slide>
 
@@ -793,14 +849,14 @@ function PortfolioModelPage() {
                 type="button"
                 onClick={handleGeneratePdf}
                 disabled={pdfLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
               </button>
               <a
                 href={mailtoUrl}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
                 style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
               >
                 <Mail className="h-4 w-4" /> Enviar por e-mail
@@ -809,7 +865,7 @@ function PortfolioModelPage() {
                 href={waShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
                 style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
               >
                 <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
@@ -818,7 +874,7 @@ function PortfolioModelPage() {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
+                className="hover-lift inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#A6C939", color: "#182338" }}
               >
                 <Phone className="h-4 w-4" /> Entrar em contato agora
@@ -861,7 +917,7 @@ function PortfolioModelPage() {
             </div>
             <div className="flex flex-col items-center gap-4">
               <KorumLogo className="h-16 w-auto" />
-              <LedTexture className="h-6 w-full opacity-60" color="#A6C939" />
+              <LedTexture className="led-pulse h-6 w-full" color="#A6C939" />
             </div>
           </div>
         </div>
