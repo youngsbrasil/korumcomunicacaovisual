@@ -301,23 +301,50 @@ function SlideFooter({ page }: { page?: string }) {
 
 function AnimatedNumber({ value, suffix = "", prefix = "", duration = 1400 }: { value: number; suffix?: string; prefix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-10%" });
   const [display, setDisplay] = useState(0);
   useEffect(() => {
-    if (!inView) return;
+    const el = ref.current;
+    if (!el) return;
+    const isCapturing = () => !!el.closest(".deck.pdf-capturing");
     const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return setDisplay(value);
-    const start = performance.now();
+    if (isCapturing() || reduce) {
+      setDisplay(value);
+      return;
+    }
     let raf = 0;
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setDisplay(Math.round(value * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
+    let started = false;
+    const animate = () => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setDisplay(Math.round(value * eased));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, value, duration]);
+    if (typeof IntersectionObserver === "undefined") {
+      animate();
+      return () => cancelAnimationFrame(raf);
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !started) {
+            started = true;
+            animate();
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [value, duration]);
   return (
     <span ref={ref}>
       {prefix}
