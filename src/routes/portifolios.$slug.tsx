@@ -104,13 +104,22 @@ function MediaRenderer({ item }: { item: MediaItem }) {
       <img
         src={item.signedUrl}
         alt={item.caption ?? ""}
-        className="w-full h-full object-cover"
+        className="max-h-full max-w-full h-auto w-auto object-contain"
+        style={{ display: "block", margin: "auto" }}
         loading="lazy"
       />
     );
   }
   if (item.kind === "video") {
-    return <video src={item.signedUrl} controls playsInline className="w-full h-full object-cover" />;
+    return (
+      <video
+        src={item.signedUrl}
+        controls
+        playsInline
+        className="max-h-full max-w-full h-auto w-auto object-contain"
+        style={{ display: "block", margin: "auto" }}
+      />
+    );
   }
   const yt = youtubeId(item.url);
   if (yt) {
@@ -120,7 +129,8 @@ function MediaRenderer({ item }: { item: MediaItem }) {
         title={item.caption ?? "Vídeo"}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-full"
+        className="h-full w-full"
+        style={{ aspectRatio: "16 / 9" }}
       />
     );
   }
@@ -325,8 +335,8 @@ function PortfolioModelPage() {
               style={{ minHeight: 0 }}
             >
               {chunk.map((item) => (
-                <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#000" }}>
-                  <div className="flex-1 min-h-0 overflow-hidden">
+                <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#182338" }}>
+                  <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden">
                     <MediaRenderer item={item} />
                   </div>
                   {item.caption && (
@@ -474,10 +484,10 @@ function PortfolioModelPage() {
 
           {/* Full-bleed hero image with accent glow */}
           <div
-            className="relative w-full overflow-hidden"
+            className="relative flex w-full items-center justify-center overflow-hidden"
             style={{
               aspectRatio: "4 / 5",
-              backgroundColor: "#000",
+              backgroundColor: "#182338",
               borderTop: `3px solid ${model.accent}`,
               borderBottom: `3px solid ${model.accent}`,
               boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.04)`,
