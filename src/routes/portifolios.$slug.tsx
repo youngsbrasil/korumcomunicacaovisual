@@ -2,7 +2,6 @@ import { Link, createFileRoute, notFound, useSearch } from "@tanstack/react-rout
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { useEffect, useRef, useState } from "react";
 import {
   Building2,
