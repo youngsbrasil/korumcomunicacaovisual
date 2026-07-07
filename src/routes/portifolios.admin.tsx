@@ -454,6 +454,11 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
         })}
       </div>
 
+      <div className="px-4 md:px-6 pt-8 pb-6">
+        <SiteSignature />
+      </div>
+
+
       {/* Bottom bar */}
       <div className="fixed bottom-0 inset-x-0 z-30 bg-korum-navy/95 backdrop-blur border-t border-white/10 px-4 py-3 flex gap-3 justify-end">
         <button
