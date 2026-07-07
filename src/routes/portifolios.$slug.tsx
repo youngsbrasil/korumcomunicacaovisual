@@ -772,6 +772,9 @@ function PortfolioModelPage() {
       {/* Section slides */}
       {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
+      {/* Impact / stats slide */}
+      <ImpactSlide accent={model.accent} />
+
       {/* Actions slide */}
       <Slide role="actions">
         <div className="flex h-full w-full flex-col">
