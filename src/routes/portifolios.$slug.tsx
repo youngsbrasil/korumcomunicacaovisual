@@ -520,79 +520,97 @@ function PortfolioModelPage() {
       {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
       {/* Actions slide */}
-      <Slide bg="navy">
-        <div className="flex h-full w-full flex-col justify-center px-6 py-8">
-          <EyebrowTag>ações</EyebrowTag>
-          <h2
-            className="font-brand-heavy mt-3 leading-tight tracking-normal"
-            style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)" }}
-          >
-            Gostou? Leve com você
-          </h2>
+      <Slide>
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-center px-6 py-8">
+            <EyebrowTag>ações</EyebrowTag>
+            <h2
+              className="font-brand-heavy mt-3 leading-tight tracking-normal"
+              style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)", color: "#EFF1F3" }}
+            >
+              Gostou? <span style={{ color: "#A6C939" }}>Leve com você</span>
+            </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <button
-              type="button"
-              onClick={handleGeneratePdf}
-              disabled={pdfLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-4 py-3.5 text-sm font-bold text-korum-paper transition-opacity hover:opacity-90 disabled:opacity-70"
-            >
-              <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
-            </button>
-            <a
-              href={mailtoUrl}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-4 py-3.5 text-sm text-korum-paper transition-colors hover:bg-korum-paper/20"
-            >
-              <Mail className="h-4 w-4" /> Enviar por e-mail
-            </a>
-            <a
-              href={waShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-paper/10 px-4 py-3.5 text-sm text-korum-paper transition-colors hover:bg-korum-paper/20"
-            >
-              <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
-            </a>
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-korum-green px-4 py-3.5 text-sm font-bold text-korum-paper transition-opacity hover:opacity-90"
-            >
-              <Phone className="h-4 w-4" /> Entrar em contato agora
-            </a>
+            <div className="mt-6 grid grid-cols-1 gap-3">
+              <button
+                type="button"
+                onClick={handleGeneratePdf}
+                disabled={pdfLoading}
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-70"
+                style={{ backgroundColor: "#A6C939", color: "#182338" }}
+              >
+                <FileDown className="h-4 w-4" /> {pdfLoading ? "Gerando PDF…" : "Salvar em PDF"}
+              </button>
+              <a
+                href={mailtoUrl}
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
+              >
+                <Mail className="h-4 w-4" /> Enviar por e-mail
+              </a>
+              <a
+                href={waShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm transition-colors"
+                style={{ backgroundColor: "rgba(239,241,243,0.08)", color: "#EFF1F3" }}
+              >
+                <Share2 className="h-4 w-4" /> Compartilhar no WhatsApp
+              </a>
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#A6C939", color: "#182338" }}
+              >
+                <Phone className="h-4 w-4" /> Entrar em contato agora
+              </a>
+            </div>
           </div>
+          <SlideFooter />
         </div>
       </Slide>
 
       {/* Contact slide */}
       <Slide bg="navy-deep">
-        <div className="flex h-full w-full flex-col justify-between px-6 py-10">
-          <div>
-            <EyebrowTag>contato</EyebrowTag>
-            <h3
-              className="font-brand-heavy mt-4 leading-tight tracking-normal text-korum-paper"
-              style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)" }}
-            >
-              Prepare-se para o futuro
-            </h3>
-            <div className="mt-6 flex flex-col gap-3 font-mono text-sm text-korum-paper/80">
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-korum-paper"
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-between px-6 py-10">
+            <div>
+              <EyebrowTag>contato</EyebrowTag>
+              <h3
+                className="font-brand-heavy mt-4 leading-tight tracking-normal"
+                style={{ fontSize: "clamp(1.8rem, 7vw, 2.6rem)", color: "#EFF1F3" }}
               >
-                <MessageCircle className="h-4 w-4" /> {WHATSAPP_DISPLAY}
-              </a>
-              <a href={`mailto:${EMAIL}`} className="hover:text-korum-paper break-all">
-                {EMAIL}
-              </a>
+                Prepare-se para o <span style={{ color: "#A6C939" }}>futuro</span>
+              </h3>
+              <div
+                className="mt-6 flex flex-col gap-3 font-mono text-sm"
+                style={{ color: "rgba(239,241,243,0.8)" }}
+              >
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2"
+                >
+                  <MessageCircle className="h-4 w-4" /> {WHATSAPP_DISPLAY}
+                </a>
+                <a href={`mailto:${EMAIL}`} className="break-all">
+                  {EMAIL}
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <KorumLogo className="h-16 w-auto" />
+              <LedTexture className="h-6 w-full opacity-60" color="#A6C939" />
             </div>
           </div>
-          <KorumLogo className="h-12 w-auto" />
         </div>
       </Slide>
+
 
       <FloatingWhatsApp message={waMessage} />
     </div>
