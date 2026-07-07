@@ -32,7 +32,8 @@ type PortfolioAdminPayload =
   | { op: "updateMedia"; token: string; id: string; caption?: string; alt?: string; ordem?: number }
   | { op: "reorderMedia"; token: string; ids: string[] }
   | { op: "deleteMedia"; token: string; id: string }
-  | { op: "publishSlug"; token: string; slug: string };
+  | { op: "publishSlug"; token: string; slug: string }
+  | { op: "listPublished"; slug: string };
 
 function verifyAdmin(token: string | undefined | null): boolean {
   if (!token) return false;
