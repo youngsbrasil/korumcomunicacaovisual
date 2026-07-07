@@ -107,7 +107,7 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper px-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-korum-navy text-korum-paper px-6">
       <form onSubmit={onSubmit} className="w-full max-w-sm flex flex-col items-center gap-6">
         <KorumLogo className="h-14 w-auto" />
         <div className="text-center">
