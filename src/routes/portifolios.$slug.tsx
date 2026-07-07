@@ -406,13 +406,13 @@ function PortfolioModelPage() {
         <Slide key={`${section.id}-media-${ci}`}>
           <div className="flex h-full w-full flex-col">
             <BrandBlocks />
-            <div className="px-6 pt-6 pb-3">
+            <div className="px-8 pt-7 pb-4 md:px-10">
               <EyebrowTag>
                 {number} · {section.eyebrow} · {ci + 2}/{totalParts}
               </EyebrowTag>
               <h3
-                className="font-brand-heavy mt-2 leading-tight tracking-normal"
-                style={{ fontSize: "clamp(1.05rem, 3.8vw, 1.35rem)", color: "#EFF1F3" }}
+                className="font-brand-heavy mt-3 leading-tight tracking-tight"
+                style={{ fontSize: "clamp(1.15rem, 4vw, 1.5rem)", color: "#EFF1F3" }}
               >
                 {section.title}
               </h3>
