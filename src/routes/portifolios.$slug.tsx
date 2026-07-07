@@ -50,6 +50,7 @@ import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
 import { KorumLogo } from "@/components/brand/KorumLogo";
 import { LedTexture } from "@/components/brand/LedTexture";
+import { SiteSignature } from "@/components/brand/SiteSignature";
 
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, findModel } from "@/data/models";
 import type { PortfolioSection } from "@/data/models";
