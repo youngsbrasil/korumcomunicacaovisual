@@ -145,9 +145,11 @@ function parseSubtitle(text: string) {
 /** Slide frame: fixed 9:16, centered, snap target. Dark theme. */
 function Slide({
   bg = "navy",
+  role,
   children,
 }: {
   bg?: "navy" | "navy-deep";
+  role?: string;
   children: React.ReactNode;
 }) {
   const bgColor = bg === "navy-deep" ? "#0f1626" : "#182338";
@@ -156,6 +158,7 @@ function Slide({
       <div
         data-slide
         data-slide-bg={bgColor}
+        data-slide-role={role}
         className="slide relative overflow-hidden rounded-2xl shadow-2xl"
         style={{
           width: "min(calc(100vw - 24px), calc((100dvh - 32px) * 9 / 16))",
@@ -169,6 +172,7 @@ function Slide({
     </div>
   );
 }
+
 
 /** Slim brand block bar (Korum identity). */
 function BrandBlocks() {
@@ -209,6 +213,8 @@ function PortfolioModelPage() {
   const sub = parseSubtitle(model.heroSubtitle);
   const waMessage = `Olá! Vi o portfólio de ${model.name} e quero um orçamento.`;
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+  const waCommercialMessage = `Olá! Vi o portfólio de ${model.name} e quero falar com o comercial.`;
+  const waCommercialUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waCommercialMessage)}`;
   const pageUrl = `${SITE_URL}/portifolios/${model.slug}`;
   const shareText = `${model.seo.title} ${pageUrl}`;
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
@@ -352,16 +358,26 @@ function PortfolioModelPage() {
     if (pdfLoading) return;
     setPdfLoading(true);
     try {
-      const slides = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
-      if (slides.length === 0) throw new Error("no slides");
+      const deckEl = document.querySelector<HTMLElement>(".deck");
+      const siteSlides = Array.from(
+        deckEl?.querySelectorAll<HTMLElement>("[data-slide]") ?? [],
+      );
+      if (siteSlides.length === 0) throw new Error("no slides");
+
+      const pdfActionsSlide = document.querySelector<HTMLElement>(
+        "[data-pdf-actions] [data-slide]",
+      );
 
       const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
       const prevDisplay = floating?.style.display ?? "";
       if (floating) floating.style.display = "none";
 
-      // Wait for images inside slides (with per-image timeout)
-      const imgs = slides.flatMap((s) => Array.from(s.querySelectorAll("img")));
-      
+      const captureSlides: HTMLElement[] = siteSlides.map((slide) =>
+        slide.dataset.slideRole === "actions" && pdfActionsSlide ? pdfActionsSlide : slide,
+      );
+
+      // Wait for images inside all slides we'll capture
+      const imgs = captureSlides.flatMap((s) => Array.from(s.querySelectorAll("img")));
       await Promise.all(
         imgs.map(
           (img) =>
@@ -374,7 +390,6 @@ function PortfolioModelPage() {
             }),
         ),
       );
-      
 
       const [{ toJpeg }, { jsPDF }] = await Promise.all([
         import("html-to-image"),
@@ -391,13 +406,13 @@ function PortfolioModelPage() {
         format: [pdfWidthMM, pdfHeightMM],
       });
 
-      for (let i = 0; i < slides.length; i++) {
-        const slide = slides[i];
-        const bg = slide.getAttribute("data-slide-bg") || "#ffffff";
+      for (let i = 0; i < captureSlides.length; i++) {
+        const slide = captureSlides[i];
+        const bg = slide.getAttribute("data-slide-bg") || "#182338";
         const rect = slide.getBoundingClientRect();
         const targetW = 540;
         const scale = targetW / rect.width;
-        
+
         const imgData = await toJpeg(slide, {
           quality: 0.94,
           pixelRatio: 2,
@@ -410,9 +425,22 @@ function PortfolioModelPage() {
         });
         if (i > 0) pdf.addPage([pdfWidthMM, pdfHeightMM], "portrait");
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfHeightMM, "", "NONE");
+
+        // Add clickable link over the CTA button in the PDF-only actions slide
+        if (slide.dataset.slideRole === "actions-pdf") {
+          const cta = slide.querySelector<HTMLElement>("[data-pdf-cta]");
+          if (cta) {
+            const slideRect = slide.getBoundingClientRect();
+            const btnRect = cta.getBoundingClientRect();
+            const xMM = ((btnRect.left - slideRect.left) / slideRect.width) * pdfWidthMM;
+            const yMM = ((btnRect.top - slideRect.top) / slideRect.height) * pdfHeightMM;
+            const wMM = (btnRect.width / slideRect.width) * pdfWidthMM;
+            const hMM = (btnRect.height / slideRect.height) * pdfHeightMM;
+            pdf.link(xMM, yMM, wMM, hMM, { url: waCommercialUrl });
+          }
+        }
       }
 
-      
       if (floating) floating.style.display = prevDisplay;
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
@@ -520,7 +548,7 @@ function PortfolioModelPage() {
       {model.sections.flatMap((section: PortfolioSection, index: number) => sectionSlides(section, index))}
 
       {/* Actions slide */}
-      <Slide>
+      <Slide role="actions">
         <div className="flex h-full w-full flex-col">
           <BrandBlocks />
           <div className="flex flex-1 flex-col justify-center px-6 py-8">
@@ -613,6 +641,65 @@ function PortfolioModelPage() {
 
 
       <FloatingWhatsApp message={waMessage} />
+
+      {/* PDF-only actions slide: rendered off-screen, captured during PDF export */}
+      <div
+        data-pdf-actions
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: "-100000px",
+          top: 0,
+          pointerEvents: "none",
+          width: "540px",
+        }}
+      >
+        <div
+          data-slide
+          data-slide-bg="#182338"
+          data-slide-role="actions-pdf"
+          className="slide relative overflow-hidden rounded-2xl"
+          style={{ width: "540px", height: "960px", backgroundColor: "#182338", color: "#EFF1F3" }}
+        >
+          <div className="flex h-full w-full flex-col">
+            <BrandBlocks />
+            <div className="flex flex-1 flex-col justify-center px-8 py-10">
+              <EyebrowTag>{"<"}fale com a gente{">"}</EyebrowTag>
+              <h2
+                className="font-brand-heavy mt-4 leading-tight tracking-normal"
+                style={{ fontSize: "2.4rem", color: "#EFF1F3" }}
+              >
+                Vamos tirar seu projeto <span style={{ color: "#A6C939" }}>do papel?</span>
+              </h2>
+              <p className="mt-4 text-base" style={{ color: "#C6CEDB" }}>
+                Toque no botão abaixo para falar direto com o nosso time comercial no WhatsApp.
+              </p>
+
+              <div className="mt-10 flex flex-col items-center gap-4">
+                <div
+                  data-pdf-cta
+                  className="flex w-full items-center justify-center rounded-2xl px-6 py-6 text-center font-bold"
+                  style={{
+                    backgroundColor: "#A6C939",
+                    color: "#182338",
+                    fontSize: "1.35rem",
+                    boxShadow: "0 12px 30px rgba(166,201,57,0.35)",
+                  }}
+                >
+                  Falar com o comercial agora
+                </div>
+                <div
+                  className="text-center"
+                  style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.85)", fontSize: "0.95rem" }}
+                >
+                  ou ligue: (11) 9 1774-8504
+                </div>
+              </div>
+            </div>
+            <SlideFooter />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
