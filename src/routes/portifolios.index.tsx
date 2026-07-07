@@ -10,6 +10,17 @@ import { SiteSignature } from "@/components/brand/SiteSignature";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, models } from "@/data/models";
 import { getPublishedCovers } from "@/lib/portfolio-media.functions";
+import coverLed from "@/assets/cover-led.jpg";
+import coverPostos from "@/assets/cover-postos.jpg";
+import coverFarmacias from "@/assets/cover-farmacias.jpg";
+import coverSupermercados from "@/assets/cover-supermercados.jpg";
+
+const fallbackCovers: Record<string, string> = {
+  led: coverLed,
+  postos: coverPostos,
+  farmacias: coverFarmacias,
+  supermercados: coverSupermercados,
+};
 
 export const Route = createFileRoute("/portifolios/")({
   head: () => ({
@@ -80,9 +91,12 @@ function PortfolioIndex() {
                   ) : cover && cover.kind === "video" && cover.signedUrl ? (
                     <video src={cover.signedUrl} className="h-full w-full object-cover" muted playsInline loop autoPlay />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center font-mono text-xs text-korum-paper/40">
-                      sem capa publicada
-                    </div>
+                    <img
+                      src={fallbackCovers[model.slug]}
+                      alt={model.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
                   )}
                 </div>
                 <div className="p-6 md:p-8">
