@@ -142,34 +142,63 @@ function parseSubtitle(text: string) {
   return { first: matches[1], second: matches[2] };
 }
 
-/** Slide frame: fixed 9:16, centered, snap target. */
+/** Slide frame: fixed 9:16, centered, snap target. Dark theme. */
 function Slide({
-  bg,
+  bg = "navy",
   children,
 }: {
-  bg: "navy" | "paper" | "navy-deep";
+  bg?: "navy" | "navy-deep";
   children: React.ReactNode;
 }) {
-  const bgClass =
-    bg === "navy"
-      ? "bg-korum-navy text-korum-paper"
-      : bg === "navy-deep"
-      ? "bg-korum-navy-deep text-korum-paper"
-      : "bg-korum-paper text-korum-navy";
-  const bgColor = bg === "navy" ? "#182338" : bg === "navy-deep" ? "#0f1626" : "#f4efe6";
+  const bgColor = bg === "navy-deep" ? "#0f1626" : "#182338";
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center snap-start py-4">
       <div
         data-slide
         data-slide-bg={bgColor}
-        className={`slide relative overflow-hidden rounded-2xl shadow-2xl ${bgClass}`}
+        className="slide relative overflow-hidden rounded-2xl shadow-2xl"
         style={{
           width: "min(calc(100vw - 24px), calc((100dvh - 32px) * 9 / 16))",
           aspectRatio: "9 / 16",
+          backgroundColor: bgColor,
+          color: "#EFF1F3",
         }}
       >
         {children}
       </div>
+    </div>
+  );
+}
+
+/** Slim brand block bar (Korum identity). */
+function BrandBlocks() {
+  return (
+    <div className="flex h-1.5 w-full shrink-0" aria-hidden>
+      <div className="flex-1" style={{ backgroundColor: "#A6C939" }} />
+      <div className="w-1/3" style={{ backgroundColor: "#0f1626" }} />
+      <div className="w-6" style={{ backgroundColor: "#A6C939" }} />
+    </div>
+  );
+}
+
+/** Small footer signature: little Korum mark + wordmark. */
+function SlideFooter({ page }: { page?: string }) {
+  return (
+    <div
+      className="flex shrink-0 items-center justify-between px-5 py-2.5"
+      style={{ borderTop: "1px solid rgba(198,206,219,0.10)" }}
+    >
+      <div className="flex items-center gap-2">
+        <KorumLogo className="h-4 w-auto opacity-90" />
+      </div>
+      {page && (
+        <span
+          className="text-[10px] tracking-widest"
+          style={{ fontFamily: "Space Mono, monospace", color: "rgba(198,206,219,0.55)" }}
+        >
+          {page}
+        </span>
+      )}
     </div>
   );
 }
@@ -200,81 +229,108 @@ function PortfolioModelPage() {
   const hero = media.find((m) => m.section_id === "__hero");
   const mediaBySection = (id: string) => media.filter((m) => m.section_id === id);
 
-  // Chunk a section into slides: 1 text slide + N media slides (2 per slide).
+  // Chunk a section into slides: 1 text slide + N media slides.
+  // 1 media = full-bleed hero image; 2 medias = stacked full-bleed.
   const sectionSlides = (section: PortfolioSection, index: number) => {
     const items = mediaBySection(section.id);
     const number = String(index + 1).padStart(2, "0");
     const mediaChunks: MediaItem[][] = [];
     for (let i = 0; i < items.length; i += 2) mediaChunks.push(items.slice(i, i + 2));
-    const totalParts = 1 + mediaChunks.length; // text + media pages
+    const totalParts = 1 + mediaChunks.length;
     const parts: React.ReactNode[] = [];
 
     parts.push(
-      <Slide bg="paper" key={`${section.id}-text`}>
-        <div className="flex h-full w-full flex-col justify-center px-6 py-8">
-          <EyebrowTag>
-            {number} · {section.eyebrow}
-            {totalParts > 1 ? ` · 1/${totalParts}` : ""}
-          </EyebrowTag>
-          <h2
-            className="font-brand-heavy mt-3 leading-tight tracking-normal text-korum-navy"
-            style={{ fontSize: "clamp(1.6rem, 6vw, 2.4rem)" }}
-          >
-            {section.title}
-          </h2>
-          <div className="mt-4 space-y-3 text-sm leading-relaxed text-korum-paper-muted md:text-base">
-            {section.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
-          {section.chips.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {section.chips.map((chip, ci) => (
-                <span
-                  key={chip}
-                  className={
-                    ci === 0
-                      ? "inline-flex items-center rounded-full bg-korum-navy px-3 py-1.5 text-xs font-medium text-korum-paper"
-                      : "inline-flex items-center rounded-full border border-korum-navy/30 px-3 py-1.5 text-xs font-medium text-korum-navy"
-                  }
-                >
-                  {chip}
-                </span>
+      <Slide key={`${section.id}-text`}>
+        <div className="flex h-full w-full flex-col">
+          <BrandBlocks />
+          <div className="flex flex-1 flex-col justify-center px-6 py-8">
+            <EyebrowTag>
+              {number} · {section.eyebrow}
+              {totalParts > 1 ? ` · 1/${totalParts}` : ""}
+            </EyebrowTag>
+            <h2
+              className="font-brand-heavy mt-3 leading-tight tracking-normal"
+              style={{ fontSize: "clamp(1.6rem, 6vw, 2.4rem)", color: "#EFF1F3" }}
+            >
+              {section.title}
+            </h2>
+            <div
+              className="mt-4 space-y-3 text-sm leading-relaxed md:text-base"
+              style={{ color: "#C6CEDB" }}
+            >
+              {section.body.map((p) => (
+                <p key={p}>{p}</p>
               ))}
             </div>
-          )}
-          {items.length === 0 && (
-            <div className="mt-6 flex flex-1 items-center justify-center rounded-2xl border-2 border-dashed border-korum-navy/30 px-4 py-8 text-center text-korum-navy/55">
-              <span className="font-mono text-xs">Fotos e vídeos entram pelo painel</span>
-            </div>
-          )}
+            {section.chips.length > 0 && (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {section.chips.map((chip, ci) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium"
+                    style={
+                      ci === 0
+                        ? { backgroundColor: "#A6C939", color: "#182338" }
+                        : {
+                            backgroundColor: "#0f1626",
+                            border: "1px solid #33455F",
+                            color: "#C6CEDB",
+                          }
+                    }
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            )}
+            {items.length === 0 && (
+              <div
+                className="mt-6 flex flex-1 items-center justify-center rounded-2xl px-4 py-8 text-center"
+                style={{ border: "2px dashed rgba(198,206,219,0.25)", color: "rgba(198,206,219,0.55)" }}
+              >
+                <span className="font-mono text-xs">Fotos e vídeos entram pelo painel</span>
+              </div>
+            )}
+          </div>
+          <SlideFooter page={`${number} / ${section.eyebrow}`} />
         </div>
       </Slide>,
     );
 
     mediaChunks.forEach((chunk, ci) => {
+      const singleImage = chunk.length === 1;
       parts.push(
-        <Slide bg="paper" key={`${section.id}-media-${ci}`}>
-          <div className="flex h-full w-full flex-col px-6 py-8">
-            <EyebrowTag>
-              {number} · {section.eyebrow} · {ci + 2}/{totalParts}
-            </EyebrowTag>
-            <h3
-              className="font-brand-heavy mt-2 leading-tight tracking-normal text-korum-navy"
-              style={{ fontSize: "clamp(1.1rem, 4vw, 1.4rem)" }}
+        <Slide key={`${section.id}-media-${ci}`}>
+          <div className="flex h-full w-full flex-col">
+            <BrandBlocks />
+            <div className="px-6 pt-6 pb-3">
+              <EyebrowTag>
+                {number} · {section.eyebrow} · {ci + 2}/{totalParts}
+              </EyebrowTag>
+              <h3
+                className="font-brand-heavy mt-2 leading-tight tracking-normal"
+                style={{ fontSize: "clamp(1.05rem, 3.8vw, 1.35rem)", color: "#EFF1F3" }}
+              >
+                {section.title}
+              </h3>
+            </div>
+            <div
+              className={`flex flex-1 flex-col ${singleImage ? "" : "gap-1"}`}
+              style={{ minHeight: 0 }}
             >
-              {section.title}
-            </h3>
-            <div className="mt-4 grid flex-1 grid-cols-1 gap-3">
               {chunk.map((item) => (
-                <figure key={item.id} className="overflow-hidden rounded-xl bg-black min-h-0">
-                  <div className="h-full w-full">
+                <figure key={item.id} className="flex min-h-0 flex-1 flex-col" style={{ backgroundColor: "#000" }}>
+                  <div className="flex-1 min-h-0 overflow-hidden">
                     <MediaRenderer item={item} />
                   </div>
                   {item.caption && (
                     <figcaption
-                      className="px-3 py-1.5 text-xs text-korum-navy/70 bg-korum-paper"
-                      style={{ fontFamily: "Space Mono, monospace" }}
+                      className="px-5 py-1.5 text-[11px]"
+                      style={{
+                        fontFamily: "Space Mono, monospace",
+                        color: "#C6CEDB",
+                        backgroundColor: "#0f1626",
+                      }}
                     >
                       {item.caption}
                     </figcaption>
@@ -282,6 +338,7 @@ function PortfolioModelPage() {
                 </figure>
               ))}
             </div>
+            <SlideFooter page={`${number} / ${section.eyebrow}`} />
           </div>
         </Slide>,
       );
@@ -289,6 +346,7 @@ function PortfolioModelPage() {
 
     return parts;
   };
+
 
   const handleGeneratePdf = async () => {
     if (pdfLoading) return;
