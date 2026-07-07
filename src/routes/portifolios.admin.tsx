@@ -17,6 +17,7 @@ import {
   adminUpdateMedia,
 } from "@/lib/portfolio-media.functions";
 import { models } from "@/data/models";
+import { compressImage, formatBytes } from "@/lib/image-compress";
 
 const TOKEN_KEY = "korum_admin_token";
 
@@ -206,17 +207,36 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
   async function handleUpload(sectionId: string, files: FileList | File[]) {
     const arr = Array.from(files);
     if (arr.length === 0) return;
-    for (const file of arr) {
-      const ext = (file.name.split(".").pop() || "bin").toLowerCase();
-      const isImage = /^(jpg|jpeg|png|webp|gif)$/.test(ext);
-      const isVideo = /^(mp4|webm|mov|m4v)$/.test(ext);
+    for (const originalFile of arr) {
+      const extRaw = (originalFile.name.split(".").pop() || "bin").toLowerCase();
+      const isImage = /^(jpg|jpeg|png|webp|gif)$/.test(extRaw);
+      const isVideo = /^(mp4|webm|mov|m4v)$/.test(extRaw);
       if (!isImage && !isVideo) {
-        toast.error(`Formato não aceito: ${file.name}`);
+        toast.error(`Formato não aceito: ${originalFile.name}`);
         continue;
       }
       markSaving();
-      const toastId = toast.loading(`Enviando ${file.name}…`);
+      const toastId = toast.loading(`Enviando ${originalFile.name}…`);
       try {
+        let file: File = originalFile;
+        let ext = extRaw;
+        if (isImage) {
+          toast.loading(`Otimizando ${originalFile.name}…`, { id: toastId });
+          const result = await compressImage(originalFile);
+          file = result.file;
+          ext = result.ext;
+          if (result.compressed) {
+            const saved = Math.round(
+              (1 - result.finalSize / result.originalSize) * 100,
+            );
+            toast.loading(
+              `Enviando ${file.name} (${formatBytes(result.originalSize)} → ${formatBytes(result.finalSize)}, -${saved}%)…`,
+              { id: toastId },
+            );
+          } else {
+            toast.loading(`Enviando ${file.name}…`, { id: toastId });
+          }
+        }
         const { path, uploadUrl } = await signUpload({
           data: { token, slug: activeSlug, ext },
         });
