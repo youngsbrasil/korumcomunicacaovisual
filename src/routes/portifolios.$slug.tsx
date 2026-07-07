@@ -338,6 +338,7 @@ function PortfolioModelPage() {
         const rect = slide.getBoundingClientRect();
         const targetW = 540;
         const scale = targetW / rect.width;
+        console.log("[pdf] rendering slide", i + 1, "/", slides.length);
         const imgData = await toJpeg(slide, {
           quality: 0.94,
           pixelRatio: 2,
@@ -352,7 +353,7 @@ function PortfolioModelPage() {
         pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMM, pdfHeightMM, "", "NONE");
       }
 
-
+      console.log("[pdf] saving");
       if (floating) floating.style.display = prevDisplay;
       pdf.save(`Korum-${model.slug}.pdf`);
     } catch (err) {
