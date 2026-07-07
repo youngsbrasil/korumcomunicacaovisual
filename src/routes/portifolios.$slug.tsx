@@ -294,9 +294,7 @@ function PortfolioModelPage() {
     if (pdfLoading) return;
     setPdfLoading(true);
     try {
-      console.log("[pdf] start");
       const slides = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
-      console.log("[pdf] slides:", slides.length);
       if (slides.length === 0) throw new Error("no slides");
 
       const floating = document.querySelector<HTMLElement>("[data-floating-whatsapp]");
