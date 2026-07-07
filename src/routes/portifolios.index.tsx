@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { EyebrowTag } from "@/components/brand/EyebrowTag";
 import { FloatingWhatsApp } from "@/components/brand/FloatingWhatsApp";
 import { KorumLogo } from "@/components/brand/KorumLogo";
+import { SiteSignature } from "@/components/brand/SiteSignature";
 import { TopBlocks } from "@/components/brand/TopBlocks";
 import { EMAIL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER, models } from "@/data/models";
 import { getPublishedCovers } from "@/lib/portfolio-media.functions";
