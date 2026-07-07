@@ -160,6 +160,23 @@ function AdminManager({ token, onLogout }: { token: string; onLogout: () => void
   const reorder = useServerFn(adminReorderMedia);
   const del = useServerFn(adminDeleteMedia);
   const publish = useServerFn(adminPublishSlug);
+  const migrateL5e = useServerFn(adminMigrateL5eAssets);
+  const [migrating, setMigrating] = useState(false);
+
+  async function handleMigrateL5e() {
+    if (!confirm("Migrar TODAS as imagens antigas (do preview) para o storage do Supabase?\nIsso corrige imagens que somem no site publicado. Pode demorar alguns minutos.")) return;
+    setMigrating(true);
+    const toastId = toast.loading("Migrando imagens antigas…");
+    try {
+      const r = await migrateL5e({ data: { token } });
+      toast.success(`Migradas ${r.migrated}/${r.total}. Falhas: ${r.failed}`, { id: toastId });
+      await reload();
+    } catch (e) {
+      toast.error("Falha na migração: " + (e instanceof Error ? e.message : "erro"), { id: toastId });
+    } finally {
+      setMigrating(false);
+    }
+  }
 
   const activeModel = useMemo(() => models.find((m) => m.slug === activeSlug)!, [activeSlug]);
 
