@@ -130,6 +130,45 @@ type MediaItem = {
   signedUrl: string;
 };
 
+const CHIP_ICON_RULES: Array<{ re: RegExp; icon: LucideIcon }> = [
+  { re: /fachada/i, icon: Building2 },
+  { re: /vitrine|loja/i, icon: Store },
+  { re: /corporativ|escritóri/i, icon: Briefcase },
+  { re: /evento|feira/i, icon: CalendarDays },
+  { re: /tráfego|publicidade/i, icon: Eye },
+  { re: /posto|combust/i, icon: Fuel },
+  { re: /supermercad|hortifrut|adega/i, icon: ShoppingCart },
+  { re: /app|web|celular|monitor/i, icon: Smartphone },
+  { re: /suporte|atendimento/i, icon: Headset },
+  { re: /nacional|mapa/i, icon: MapPin },
+  { re: /cruz/i, icon: Plus },
+  { re: /p2|p3|p4|p5|pixel|mm/i, icon: Ruler },
+  { re: /3d/i, icon: Layers },
+  { re: /poster|display/i, icon: Monitor },
+  { re: /coluna/i, icon: Boxes },
+  { re: /totem/i, icon: Signpost },
+  { re: /painel|telão|led/i, icon: Radio },
+  { re: /precificad|preço|anp/i, icon: Tag },
+  { re: /kit|trilho|mobiliári/i, icon: Package },
+  { re: /lixeira/i, icon: Trash2 },
+  { re: /óleo|calibrad/i, icon: Droplet },
+  { re: /caixa/i, icon: LayoutGrid },
+  { re: /campanha|agendamento|integração|crm/i, icon: CalendarClock },
+  { re: /controle/i, icon: Cpu },
+  { re: /acm/i, icon: Layers },
+  { re: /letra caixa/i, icon: Sparkles },
+  { re: /adesiv/i, icon: Sticker },
+  { re: /setor|gôndola|categoria|balcão|farmac|oferta|promocional/i, icon: Megaphone },
+  { re: /projeto|engenharia|acabamento|garantia|instala/i, icon: Wrench },
+  { re: /identidade|padroniz|estética/i, icon: Palette },
+  { re: /integração/i, icon: Link2 },
+];
+
+function iconForChip(chip: string): LucideIcon | null {
+  for (const rule of CHIP_ICON_RULES) if (rule.re.test(chip)) return rule.icon;
+  return null;
+}
+
 function youtubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
   return m ? m[1] : null;
