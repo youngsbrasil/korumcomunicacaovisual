@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProvisorioRouteImport } from './routes/provisorio'
 import { Route as PortifoliosRouteImport } from './routes/portifolios'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortifoliosIndexRouteImport } from './routes/portifolios.index'
 import { Route as PortifoliosAdminRouteImport } from './routes/portifolios.admin'
 import { Route as PortifoliosSlugRouteImport } from './routes/portifolios.$slug'
 
+const ProvisorioRoute = ProvisorioRouteImport.update({
+  id: '/provisorio',
+  path: '/provisorio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortifoliosRoute = PortifoliosRouteImport.update({
   id: '/portifolios',
   path: '/portifolios',
@@ -44,12 +50,14 @@ const PortifoliosSlugRoute = PortifoliosSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
+  '/provisorio': typeof ProvisorioRoute
   '/portifolios/$slug': typeof PortifoliosSlugRoute
   '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios/': typeof PortifoliosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/provisorio': typeof ProvisorioRoute
   '/portifolios/$slug': typeof PortifoliosSlugRoute
   '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios': typeof PortifoliosIndexRoute
@@ -58,6 +66,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/portifolios': typeof PortifoliosRouteWithChildren
+  '/provisorio': typeof ProvisorioRoute
   '/portifolios/$slug': typeof PortifoliosSlugRoute
   '/portifolios/admin': typeof PortifoliosAdminRoute
   '/portifolios/': typeof PortifoliosIndexRoute
@@ -67,15 +76,22 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/portifolios'
+    | '/provisorio'
     | '/portifolios/$slug'
     | '/portifolios/admin'
     | '/portifolios/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/portifolios/$slug' | '/portifolios/admin' | '/portifolios'
+  to:
+    | '/'
+    | '/provisorio'
+    | '/portifolios/$slug'
+    | '/portifolios/admin'
+    | '/portifolios'
   id:
     | '__root__'
     | '/'
     | '/portifolios'
+    | '/provisorio'
     | '/portifolios/$slug'
     | '/portifolios/admin'
     | '/portifolios/'
@@ -84,10 +100,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PortifoliosRoute: typeof PortifoliosRouteWithChildren
+  ProvisorioRoute: typeof ProvisorioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/provisorio': {
+      id: '/provisorio'
+      path: '/provisorio'
+      fullPath: '/provisorio'
+      preLoaderRoute: typeof ProvisorioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portifolios': {
       id: '/portifolios'
       path: '/portifolios'
@@ -145,6 +169,7 @@ const PortifoliosRouteWithChildren = PortifoliosRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PortifoliosRoute: PortifoliosRouteWithChildren,
+  ProvisorioRoute: ProvisorioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
