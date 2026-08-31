@@ -54,6 +54,10 @@ import portfolioFachadaBurgerKing1 from "@/assets/portfolio-fachada-burger-king-
 import portfolioFachadaBurgerKing2 from "@/assets/portfolio-fachada-burger-king-2.jpeg";
 import portfolioTotemCarrefour1 from "@/assets/portfolio-totem-carrefour-1.jpeg";
 import portfolioTotemCarrefour2 from "@/assets/portfolio-totem-carrefour-2.jpeg";
+import portfolioTotemGulf from "@/assets/totem-gulf.jpg";
+import portfolioTotemLemon from "@/assets/totem-lemon.jpg";
+import portfolioTotemPaoAcucar from "@/assets/totem-pao-acucar.png";
+import portfolioTotemSwift from "@/assets/totem-swift.jpg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -671,6 +675,30 @@ const portfolioItems = [
     span: "col-span-1 row-span-1",
     img: portfolioTotemEstapar3,
   },
+  {
+    title: "Totem Gulf",
+    category: "Totem Posto de Combustível",
+    span: "col-span-1 row-span-2",
+    img: portfolioTotemGulf,
+  },
+  {
+    title: "Totem Lemon Supermercados",
+    category: "Totem Varejo",
+    span: "col-span-2 row-span-1",
+    img: portfolioTotemLemon,
+  },
+  {
+    title: "Totem Pão de Açúcar",
+    category: "Totem Varejo",
+    span: "col-span-1 row-span-1",
+    img: portfolioTotemPaoAcucar,
+  },
+  {
+    title: "Totem Swift",
+    category: "Totem Alimentício",
+    span: "col-span-1 row-span-1",
+    img: portfolioTotemSwift,
+  },
 ];
 
 function PortfolioPreview() {
@@ -686,7 +714,7 @@ function PortfolioPreview() {
             Projetos que falam por si
           </h2>
         </div>
-        <div className="grid auto-rows-[200px] grid-cols-2 gap-4 md:auto-rows-[240px] md:grid-cols-4">
+        <div className="grid auto-rows-[200px] grid-cols-2 gap-4 [grid-auto-flow:dense] md:auto-rows-[240px] md:grid-cols-4">
           {portfolioItems.map((item, i) => (
             <div
               key={item.title + i}
