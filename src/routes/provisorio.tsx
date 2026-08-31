@@ -328,10 +328,10 @@ function Solutions() {
 
 /* ─── Business Segments ─── */
 const segments = [
-  { title: "Supermercados e Varejos", img: segmentNovo1 },
-  { title: "Restaurantes e Cafés", img: segmentNovo2 },
-  { title: "Lojas e Conveniências", img: segmentNovo3 },
-  { title: "Feiras e Eventos", img: segmentNovo4 },
+  { title: "Supermercados e Varejos", img: segmentNovo4 },
+  { title: "Restaurantes e Cafés", img: segmentNovo3 },
+  { title: "Lojas e Conveniências", img: segmentNovo2 },
+  { title: "Feiras e Eventos", img: segmentNovo1 },
 ];
 
 function BusinessSegments() {
