@@ -11,6 +11,7 @@ import {
   Factory,
   HardHat,
   ChevronRight,
+  ChevronLeft,
   ExternalLink,
   CheckCircle,
   Star,
@@ -18,6 +19,7 @@ import {
   Plane,
   ArrowUpDown,
   CreditCard,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -701,8 +703,127 @@ const portfolioItems = [
   },
 ];
 
+function PortfolioLightbox({
+  index,
+  onClose,
+  onIndexChange,
+}: {
+  index: number;
+  onClose: () => void;
+  onIndexChange: (i: number) => void;
+}) {
+  const total = portfolioItems.length;
+
+  const goTo = (next: number) => {
+    onIndexChange(((next % total) + total) % total);
+  };
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      goTo(index + 1);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [index]);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") goTo(index + 1);
+      if (e.key === "ArrowLeft") goTo(index - 1);
+    };
+    window.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [index]);
+
+  const item = portfolioItems[index];
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-korum-navy-deep/95 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-10 rounded-full bg-korum-navy/60 p-2 text-korum-paper transition-colors hover:bg-korum-navy hover:text-korum-green"
+        aria-label="Fechar"
+      >
+        <X size={22} />
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          goTo(index - 1);
+        }}
+        className="absolute left-2 z-10 rounded-full bg-korum-navy/60 p-2 text-korum-paper transition-colors hover:bg-korum-navy hover:text-korum-green sm:left-6 sm:p-3"
+        aria-label="Imagem anterior"
+      >
+        <ChevronLeft size={28} />
+      </button>
+
+      <div
+        className="relative mx-4 flex max-h-[85vh] w-full max-w-4xl flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative w-full overflow-hidden rounded-xl bg-korum-navy">
+          <img
+            src={item.img}
+            alt={item.title}
+            className="max-h-[70vh] w-full object-contain"
+          />
+        </div>
+        <div className="mt-4 flex flex-col items-center gap-3 text-center">
+          <div>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-korum-green">
+              {item.category}
+            </span>
+            <h3 className="mt-1 text-base font-bold text-korum-paper sm:text-lg">
+              {item.title}
+            </h3>
+          </div>
+          <span className="text-xs font-medium tracking-wider text-korum-paper/60">
+            {index + 1} de {total}
+          </span>
+          <div className="flex max-w-full flex-wrap items-center justify-center gap-2 px-4">
+            {portfolioItems.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goTo(i)}
+                className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                  i === index ? "w-6 bg-korum-green" : "bg-korum-paper/30 hover:bg-korum-paper/50"
+                }`}
+                aria-label={`Ir para imagem ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          goTo(index + 1);
+        }}
+        className="absolute right-2 z-10 rounded-full bg-korum-navy/60 p-2 text-korum-paper transition-colors hover:bg-korum-navy hover:text-korum-green sm:right-6 sm:p-3"
+        aria-label="Próxima imagem"
+      >
+        <ChevronRight size={28} />
+      </button>
+    </div>
+  );
+}
+
 function PortfolioPreview() {
   const ref = useReveal<HTMLDivElement>();
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   return (
     <section className="relative bg-korum-paper py-24 sm:py-32">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -718,6 +839,7 @@ function PortfolioPreview() {
           {portfolioItems.map((item, i) => (
             <div
               key={item.title + i}
+              onClick={() => setLightboxIndex(i)}
               className={`reveal group relative cursor-pointer overflow-hidden rounded-xl bg-korum-navy ${item.span}`}
               style={{ transitionDelay: `${i * 0.1}s` }}
             >
@@ -753,6 +875,13 @@ function PortfolioPreview() {
           </Link>
         </div>
       </div>
+      {lightboxIndex !== null && (
+        <PortfolioLightbox
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
+      )}
     </section>
   );
 }
