@@ -615,6 +615,30 @@ const portfolioItems = [
     span: "col-span-1 row-span-1",
     img: portfolioFachadaMinasBomba2,
   },
+  {
+    title: "Fachada Burger King",
+    category: "Fachada Fast Food",
+    span: "col-span-1 row-span-2",
+    img: segmentNovo1,
+  },
+  {
+    title: "Fachada Burger King",
+    category: "Fachada Fast Food",
+    span: "col-span-2 row-span-1",
+    img: segmentNovo2,
+  },
+  {
+    title: "Totem Carrefour",
+    category: "Totem Varejo",
+    span: "col-span-1 row-span-1",
+    img: segmentNovo3,
+  },
+  {
+    title: "Totem Carrefour",
+    category: "Totem Varejo",
+    span: "col-span-1 row-span-1",
+    img: segmentNovo4,
+  },
 ];
 
 function PortfolioPreview() {
