@@ -42,6 +42,10 @@ import portfolioFachadaBK2 from "@/assets/portfolio-fachada-burger-king-2.jpg";
 import portfolioFachadaCarrefour from "@/assets/portfolio-fachada-carrefour-express.jpeg";
 import portfolioFachadaFarmelhor from "@/assets/portfolio-fachada-farmelhor.jpeg";
 import portfolioFachadaMacSaude from "@/assets/portfolio-fachada-mac-saude.jpeg";
+import portfolioFachadaMacPao1 from "@/assets/portfolio-fachada-macpao-1.jpeg";
+import portfolioFachadaMacPao2 from "@/assets/portfolio-fachada-macpao-2.jpeg";
+import portfolioFachadaMinasBomba1 from "@/assets/portfolio-fachada-minas-bomba-1.jpeg";
+import portfolioFachadaMinasBomba2 from "@/assets/portfolio-fachada-minas-bomba-2.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -586,6 +590,30 @@ const portfolioItems = [
     category: "Fachada Saúde",
     span: "col-span-1 row-span-1",
     img: portfolioFachadaMacSaude,
+  },
+  {
+    title: "Fachada MacPão",
+    category: "Fachada Padaria",
+    span: "col-span-2 row-span-1",
+    img: portfolioFachadaMacPao1,
+  },
+  {
+    title: "Fachada MacPão",
+    category: "Fachada Padaria",
+    span: "col-span-1 row-span-2",
+    img: portfolioFachadaMacPao2,
+  },
+  {
+    title: "Fachada Minas Bomba",
+    category: "Fachada Confeitaria",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaMinasBomba1,
+  },
+  {
+    title: "Fachada Minas Bomba",
+    category: "Fachada Confeitaria",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaMinasBomba2,
   },
 ];
 
