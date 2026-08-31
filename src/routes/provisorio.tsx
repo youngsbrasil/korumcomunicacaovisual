@@ -43,20 +43,18 @@ const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
 
 /* ─── Hero ─── */
-const HERO_SEGMENTS: { text: string; highlight?: "green" | "cyan" | "orange" }[] = [
+const HERO_SEGMENTS: { text: string; highlight?: "green" }[] = [
   { text: "Da Fachada ao Interior: criamos lojas e " },
   { text: "negócios", highlight: "green" },
   { text: " que " },
-  { text: "aparecem mais", highlight: "cyan" },
+  { text: "aparecem mais", highlight: "green" },
   { text: " e " },
-  { text: "vendem mais", highlight: "orange" },
+  { text: "vendem mais", highlight: "green" },
   { text: "." },
 ];
 
 const HERO_HIGHLIGHT_CLASS: Record<string, string> = {
   green: "text-korum-green",
-  cyan: "text-korum-cyan",
-  orange: "text-korum-orange",
 };
 
 function renderHeroText(typedText: string) {
