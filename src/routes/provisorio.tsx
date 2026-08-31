@@ -34,6 +34,10 @@ import segmentSupermarket from "@/assets/segment-supermarket.jpg";
 import segmentRestaurant from "@/assets/segment-restaurant.jpg";
 import segmentStore from "@/assets/segment-store.jpg";
 import segmentEvents from "@/assets/segment-events.jpg";
+import portfolioFachadaAlt1 from "@/assets/portfolio-fachada-alternativa-1.jpeg";
+import portfolioFachadaAlt2 from "@/assets/portfolio-fachada-alternativa-2.jpeg";
+import portfolioFachadaAlt3 from "@/assets/portfolio-fachada-alternativa-3.jpeg";
+import portfolioFachadaBK from "@/assets/portfolio-fachada-burger-king.jpg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -503,12 +507,30 @@ function Method() {
 
 /* ─── Portfolio Preview ─── */
 const portfolioItems = [
-  { title: "Torre Corporativa Alfa", category: "Fachada ACM", span: "col-span-2 row-span-2" },
-  { title: "LED Indoor Premium", category: "Painel LED", span: "col-span-1 row-span-1" },
-  { title: "Sinalização Hospital Central", category: "Wayfinding", span: "col-span-1 row-span-1" },
-  { title: "Showroom Autotech", category: "Projeto Especial", span: "col-span-1 row-span-2" },
-  { title: "Centro Comercial Vega", category: "Fachada ACM", span: "col-span-1 row-span-1" },
-  { title: "Arena Sports Park", category: "Painel LED", span: "col-span-1 row-span-1" },
+  {
+    title: "Fachada Alternativa e Locação",
+    category: "Fachada Comercial",
+    span: "col-span-2 row-span-2",
+    img: portfolioFachadaAlt1,
+  },
+  {
+    title: "Fachada Alternativa e Locação",
+    category: "Fachada Comercial",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaAlt2,
+  },
+  {
+    title: "Fachada Burger King",
+    category: "Fachada Fast Food",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaBK,
+  },
+  {
+    title: "Fachada Alternativa e Locação",
+    category: "Fachada Comercial",
+    span: "col-span-2 row-span-1",
+    img: portfolioFachadaAlt3,
+  },
 ];
 
 function PortfolioPreview() {
@@ -524,15 +546,20 @@ function PortfolioPreview() {
             Projetos que falam por si
           </h2>
         </div>
-        <div className="grid auto-rows-[200px] grid-cols-2 gap-4 md:auto-rows-[240px] md:grid-cols-3">
+        <div className="grid auto-rows-[200px] grid-cols-2 gap-4 md:auto-rows-[240px] md:grid-cols-4">
           {portfolioItems.map((item, i) => (
             <div
-              key={item.title}
+              key={item.title + i}
               className={`reveal group relative cursor-pointer overflow-hidden rounded-xl bg-korum-navy ${item.span}`}
               style={{ transitionDelay: `${i * 0.1}s` }}
             >
-              <div className="absolute inset-0 z-10 bg-gradient-to-t from-korum-navy-deep via-korum-navy/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-br from-korum-green/20 to-korum-navy transition-transform duration-700 group-hover:scale-110" />
+              <img
+                src={item.img}
+                alt={item.title}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-korum-navy-deep/95 via-korum-navy/50 to-transparent" />
               <div className="absolute bottom-0 left-0 z-20 p-5">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-korum-green">
                   {item.category}
