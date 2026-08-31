@@ -30,10 +30,10 @@ import { useReveal } from "@/hooks/useReveal";
 import { useCounter } from "@/hooks/useCounter";
 import { KorumLogo } from "@/components/brand/KorumLogo";
 import { SiteSignature } from "@/components/brand/SiteSignature";
-import segmentSupermarket from "@/assets/segment-supermarket.jpg";
-import segmentRestaurant from "@/assets/segment-restaurant.jpg";
-import segmentStore from "@/assets/segment-store.jpg";
-import segmentEvents from "@/assets/segment-events.jpg";
+import segmentNovo1 from "@/assets/segment-novo-1.png";
+import segmentNovo2 from "@/assets/segment-novo-2.png";
+import segmentNovo3 from "@/assets/segment-novo-3.png";
+import segmentNovo4 from "@/assets/segment-novo-4.png";
 import portfolioFachadaAlt1 from "@/assets/portfolio-fachada-alternativa-1.jpeg";
 import portfolioFachadaAlt2 from "@/assets/portfolio-fachada-alternativa-2.jpeg";
 import portfolioFachadaAlt3 from "@/assets/portfolio-fachada-alternativa-3.jpeg";
@@ -328,10 +328,10 @@ function Solutions() {
 
 /* ─── Business Segments ─── */
 const segments = [
-  { title: "Supermercados e Varejos", img: segmentSupermarket },
-  { title: "Restaurantes e Cafés", img: segmentRestaurant },
-  { title: "Lojas e Conveniências", img: segmentStore },
-  { title: "Feiras e Eventos", img: segmentEvents },
+  { title: "Supermercados e Varejos", img: segmentNovo1 },
+  { title: "Restaurantes e Cafés", img: segmentNovo2 },
+  { title: "Lojas e Conveniências", img: segmentNovo3 },
+  { title: "Feiras e Eventos", img: segmentNovo4 },
 ];
 
 function BusinessSegments() {
