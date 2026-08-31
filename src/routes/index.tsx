@@ -50,7 +50,7 @@ function Index() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.6 }} className="mb-6 text-center md:mb-8">
         <h1 className="font-display mb-3 text-4xl font-black tracking-normal md:text-6xl lg:text-7xl">
-          <span className="text-gradient-korum">ESTAMOS</span> <span>EM OBRAS!</span>
+          <span className="text-gradient-korum">EM</span> <span>MANUTENÇÃO</span>
         </h1>
         <p className="mx-auto max-w-lg text-base leading-relaxed text-korum-paper/75 md:text-lg lg:text-xl">
           Já já um novo site para você conhecer tudo sobre a <span className="font-semibold text-korum-orange">Korum Comunicação Visual</span> e nossos Projetos Magníficos.
