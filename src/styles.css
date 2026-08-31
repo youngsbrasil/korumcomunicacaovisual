@@ -68,6 +68,21 @@
   --color-korum-cyan: var(--korum-cyan);
   --color-korum-orange: var(--korum-orange);
   --color-korum-whatsapp: var(--korum-whatsapp);
+
+  /* --- Manual de Marca Korum v1.0 — escopo isolado (prefixo k-) ---
+   * Tokens oficiais. NAO reutilizar os tokens korum-* legados, que sao
+   * consumidos por /portifolios e / e serao migrados em etapa separada. */
+  --color-k-green: var(--k-green);
+  --color-k-green-deep: var(--k-green-deep);
+  --color-k-graphite: var(--k-graphite);
+  --color-k-black: var(--k-black);
+  --color-k-blue-deep: var(--k-blue-deep);
+  --color-k-alert: var(--k-alert);
+  --color-k-n100: var(--k-n100);
+  --color-k-n200: var(--k-n200);
+  --color-k-n300: var(--k-n300);
+  --color-k-n400: var(--k-n400);
+  --color-k-n500: var(--k-n500);
 }
 
 :root {
@@ -113,6 +128,19 @@
   --korum-cyan: oklch(0.79 0.129 212.1);
   --korum-orange: oklch(0.72 0.16 55.7);
   --korum-whatsapp: oklch(0.75 0.178 151.8);
+
+  /* Paleta oficial — Manual de Marca Korum v1.0 (pags. 19-21) */
+  --k-green: oklch(0.8640 0.2119 122.98);      /* #B9E700 Verde Korum */
+  --k-green-deep: oklch(0.6795 0.1710 125.11); /* #80A900 Verde Profundo */
+  --k-graphite: oklch(0.3677 0 0);             /* #3F3F3F Grafite Korum */
+  --k-black: oklch(0.1695 0.0069 135.03);      /* #0E100D Preto Korum */
+  --k-blue-deep: oklch(0.3067 0.0544 244.88);  /* #153249 Azul Profundo */
+  --k-alert: oklch(0.5755 0.1606 28.18);       /* #C64A3F Alerta (so erros) */
+  --k-n100: oklch(0.9683 0.0054 117.92);       /* #F4F5F1 */
+  --k-n200: oklch(0.8971 0.0097 119.59);       /* #DCDED7 */
+  --k-n300: oklch(0.7720 0.0176 125.36);       /* #B2B7AB */
+  --k-n400: oklch(0.5946 0.0101 134.91);       /* #7C807A */
+  --k-n500: oklch(0.4548 0.0148 122.02);       /* #55584F */
 }
 
 .dark {
@@ -157,6 +185,19 @@
   --korum-cyan: oklch(0.79 0.129 212.1);
   --korum-orange: oklch(0.72 0.16 55.7);
   --korum-whatsapp: oklch(0.75 0.178 151.8);
+
+  /* Paleta oficial — Manual de Marca Korum v1.0 (pags. 19-21) */
+  --k-green: oklch(0.8640 0.2119 122.98);      /* #B9E700 Verde Korum */
+  --k-green-deep: oklch(0.6795 0.1710 125.11); /* #80A900 Verde Profundo */
+  --k-graphite: oklch(0.3677 0 0);             /* #3F3F3F Grafite Korum */
+  --k-black: oklch(0.1695 0.0069 135.03);      /* #0E100D Preto Korum */
+  --k-blue-deep: oklch(0.3067 0.0544 244.88);  /* #153249 Azul Profundo */
+  --k-alert: oklch(0.5755 0.1606 28.18);       /* #C64A3F Alerta (so erros) */
+  --k-n100: oklch(0.9683 0.0054 117.92);       /* #F4F5F1 */
+  --k-n200: oklch(0.8971 0.0097 119.59);       /* #DCDED7 */
+  --k-n300: oklch(0.7720 0.0176 125.36);       /* #B2B7AB */
+  --k-n400: oklch(0.5946 0.0101 134.91);       /* #7C807A */
+  --k-n500: oklch(0.4548 0.0148 122.02);       /* #55584F */
 }
 
 @layer base {
@@ -177,6 +218,25 @@
 
 @utility font-brand-heavy {
   font-family: "Archivo Black", sans-serif;
+}
+
+/* --- Escopo tipografico do Manual de Marca (pag. 23) ---
+ * Aplicado apenas dentro de [data-brand="korum-v1"], para nao afetar
+ * /portifolios nem / que ainda rodam em Space Grotesk. */
+[data-brand="korum-v1"] {
+  font-family: "Inter", sans-serif;
+  color: var(--k-graphite);
+  background-color: #fff;
+}
+
+@utility font-k-display {
+  font-family: "Archivo Black", sans-serif;
+  font-style: normal; /* manual proibe italico (pag. 24) */
+}
+
+@utility font-k-mono {
+  font-family: "Space Mono", monospace;
+  font-style: normal;
 }
 
 @utility bg-grid-pattern {
