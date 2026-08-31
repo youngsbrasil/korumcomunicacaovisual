@@ -38,6 +38,10 @@ import portfolioFachadaAlt1 from "@/assets/portfolio-fachada-alternativa-1.jpeg"
 import portfolioFachadaAlt2 from "@/assets/portfolio-fachada-alternativa-2.jpeg";
 import portfolioFachadaAlt3 from "@/assets/portfolio-fachada-alternativa-3.jpeg";
 import portfolioFachadaBK from "@/assets/portfolio-fachada-burger-king.jpg";
+import portfolioFachadaBK2 from "@/assets/portfolio-fachada-burger-king-2.jpg";
+import portfolioFachadaCarrefour from "@/assets/portfolio-fachada-carrefour-express.jpeg";
+import portfolioFachadaFarmelhor from "@/assets/portfolio-fachada-farmelhor.jpeg";
+import portfolioFachadaMacSaude from "@/assets/portfolio-fachada-mac-saude.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -558,6 +562,30 @@ const portfolioItems = [
     category: "Fachada Comercial",
     span: "col-span-2 row-span-1",
     img: portfolioFachadaAlt3,
+  },
+  {
+    title: "Fachada Burger King",
+    category: "Fachada Fast Food",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaBK2,
+  },
+  {
+    title: "Fachada Carrefour Express",
+    category: "Fachada Varejo",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaCarrefour,
+  },
+  {
+    title: "Fachada Farmelhor",
+    category: "Fachada Farmácia",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaFarmelhor,
+  },
+  {
+    title: "Fachada Mac Saúde",
+    category: "Fachada Saúde",
+    span: "col-span-1 row-span-1",
+    img: portfolioFachadaMacSaude,
   },
 ];
 
