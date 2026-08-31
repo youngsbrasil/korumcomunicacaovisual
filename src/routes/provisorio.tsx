@@ -46,6 +46,10 @@ import portfolioFachadaMacPao1 from "@/assets/portfolio-fachada-macpao-1.jpeg";
 import portfolioFachadaMacPao2 from "@/assets/portfolio-fachada-macpao-2.jpeg";
 import portfolioFachadaMinasBomba1 from "@/assets/portfolio-fachada-minas-bomba-1.jpeg";
 import portfolioFachadaMinasBomba2 from "@/assets/portfolio-fachada-minas-bomba-2.jpeg";
+import portfolioTotemEstapar1 from "@/assets/portfolio-totem-estapar-1.jpeg";
+import portfolioTotemEstapar1b from "@/assets/portfolio-totem-estapar-1b.png";
+import portfolioTotemEstapar2 from "@/assets/portfolio-totem-estapar-2.jpeg";
+import portfolioTotemEstapar3 from "@/assets/portfolio-totem-estapar-3.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -638,6 +642,30 @@ const portfolioItems = [
     category: "Totem Varejo",
     span: "col-span-1 row-span-1",
     img: segmentNovo4,
+  },
+  {
+    title: "Totem Estapar",
+    category: "Totem Estacionamento",
+    span: "col-span-1 row-span-2",
+    img: portfolioTotemEstapar1,
+  },
+  {
+    title: "Totem Estapar",
+    category: "Totem Estacionamento",
+    span: "col-span-1 row-span-1",
+    img: portfolioTotemEstapar1b,
+  },
+  {
+    title: "Totem Estapar",
+    category: "Totem Estacionamento",
+    span: "col-span-2 row-span-1",
+    img: portfolioTotemEstapar2,
+  },
+  {
+    title: "Totem Estapar",
+    category: "Totem Estacionamento",
+    span: "col-span-1 row-span-1",
+    img: portfolioTotemEstapar3,
   },
 ];
 
