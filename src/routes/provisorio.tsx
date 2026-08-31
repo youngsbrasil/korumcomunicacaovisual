@@ -50,6 +50,10 @@ import portfolioTotemEstapar1 from "@/assets/portfolio-totem-estapar-1.jpeg";
 import portfolioTotemEstapar1b from "@/assets/portfolio-totem-estapar-1b.png";
 import portfolioTotemEstapar2 from "@/assets/portfolio-totem-estapar-2.jpeg";
 import portfolioTotemEstapar3 from "@/assets/portfolio-totem-estapar-3.jpeg";
+import portfolioFachadaBurgerKing1 from "@/assets/portfolio-fachada-burger-king-1.jpeg";
+import portfolioFachadaBurgerKing2 from "@/assets/portfolio-fachada-burger-king-2.jpeg";
+import portfolioTotemCarrefour1 from "@/assets/portfolio-totem-carrefour-1.jpeg";
+import portfolioTotemCarrefour2 from "@/assets/portfolio-totem-carrefour-2.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -623,25 +627,25 @@ const portfolioItems = [
     title: "Fachada Burger King",
     category: "Fachada Fast Food",
     span: "col-span-1 row-span-2",
-    img: segmentNovo1,
+    img: portfolioFachadaBurgerKing1,
   },
   {
     title: "Fachada Burger King",
     category: "Fachada Fast Food",
     span: "col-span-2 row-span-1",
-    img: segmentNovo2,
+    img: portfolioFachadaBurgerKing2,
   },
   {
     title: "Totem Carrefour",
     category: "Totem Varejo",
     span: "col-span-1 row-span-1",
-    img: segmentNovo3,
+    img: portfolioTotemCarrefour1,
   },
   {
     title: "Totem Carrefour",
     category: "Totem Varejo",
     span: "col-span-1 row-span-1",
-    img: segmentNovo4,
+    img: portfolioTotemCarrefour2,
   },
   {
     title: "Totem Estapar",
