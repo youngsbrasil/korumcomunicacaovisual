@@ -43,11 +43,41 @@ const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
 
 /* ─── Hero ─── */
+const HERO_SEGMENTS: { text: string; highlight?: "green" | "cyan" | "orange" }[] = [
+  { text: "Da Fachada ao Interior: criamos lojas e " },
+  { text: "negócios", highlight: "green" },
+  { text: " que " },
+  { text: "aparecem mais", highlight: "cyan" },
+  { text: " e " },
+  { text: "vendem mais", highlight: "orange" },
+  { text: "." },
+];
+
+const HERO_HIGHLIGHT_CLASS: Record<string, string> = {
+  green: "text-korum-green",
+  cyan: "text-korum-cyan",
+  orange: "text-korum-orange",
+};
+
+function renderHeroText(typedText: string) {
+  let remaining = typedText.length;
+  return HERO_SEGMENTS.map((seg, idx) => {
+    if (remaining <= 0) return null;
+    const chunk = seg.text.slice(0, remaining);
+    remaining -= chunk.length;
+    if (!chunk) return null;
+    return (
+      <span key={idx} className={seg.highlight ? HERO_HIGHLIGHT_CLASS[seg.highlight] : undefined}>
+        {chunk}
+      </span>
+    );
+  });
+}
+
 function Hero() {
   const ref = useReveal<HTMLDivElement>();
   const [typedText, setTypedText] = useState("");
-  const fullText =
-    "Da Fachada ao Interior: criamos lojas e negócios que aparecem e vendem mais.";
+  const fullText = HERO_SEGMENTS.map((s) => s.text).join("");
 
   useEffect(() => {
     let i = 0;
@@ -79,7 +109,7 @@ function Hero() {
           Comunicação Visual de Alta Performance
         </p>
         <h1 className="mb-8 min-h-[1.1em] text-4xl font-extrabold leading-[1.1] tracking-tight text-korum-paper sm:text-5xl md:text-6xl lg:text-7xl">
-          {typedText}
+          {renderHeroText(typedText)}
           <span className="ml-1 inline-block h-[0.8em] w-[3px] animate-pulse bg-korum-green" />
         </h1>
         <p
