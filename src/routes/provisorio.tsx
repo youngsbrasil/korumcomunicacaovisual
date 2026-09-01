@@ -180,7 +180,7 @@ function Hero() {
         >
           Comunicação Visual de Alta Performance
         </p>
-        <h1 className="mb-8 min-h-[1.1em] text-4xl font-extrabold leading-[1.1] tracking-tight text-korum-paper sm:text-5xl md:text-6xl lg:text-7xl">
+        <h1 className="mb-8 min-h-[1.1em] text-3xl font-extrabold leading-[1.15] tracking-tight text-korum-paper sm:text-4xl md:text-5xl lg:text-6xl">
           {renderHeroText(typedText)}
           <span className="ml-1 inline-block h-[0.8em] w-[3px] animate-pulse bg-korum-green" />
         </h1>
