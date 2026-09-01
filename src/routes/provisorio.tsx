@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -486,11 +486,30 @@ const differentials = [
 
 function Differentials() {
   const ref = useReveal<HTMLDivElement>();
+  const sectionRef = useRef<HTMLElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current || !bgRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const progress = (vh - rect.top) / (vh + rect.height);
+      const clamped = Math.min(1, Math.max(0, progress));
+      const translateY = (clamped - 0.5) * 80;
+      bgRef.current.style.transform = `translateY(${translateY}px) scale(1.15)`;
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <section className="relative overflow-hidden bg-korum-paper py-24 sm:py-32">
+    <section ref={sectionRef} className="relative overflow-hidden bg-korum-paper py-24 sm:py-32">
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-[0.15]"
-        style={{ backgroundImage: `url(${differentialsBg})` }}
+        ref={bgRef}
+        className="absolute inset-0 -top-10 -bottom-10 bg-cover bg-center opacity-[0.15] will-change-transform"
+        style={{ backgroundImage: `url(${differentialsBg})`, transform: "scale(1.15)" }}
       />
       <div className="absolute inset-0 bg-korum-paper/70" />
       <div ref={ref} className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
