@@ -32,6 +32,7 @@ import { useReveal } from "@/hooks/useReveal";
 import { useCounter } from "@/hooks/useCounter";
 import { KorumLogo } from "@/components/brand/KorumLogo";
 import { SiteSignature } from "@/components/brand/SiteSignature";
+import { SiteFooter } from "@/components/brand/SiteFooter";
 import segmentNovo1 from "@/assets/segment-novo-1.png";
 import segmentNovo2 from "@/assets/segment-novo-2.png";
 import segmentNovo3 from "@/assets/segment-novo-3.png";
@@ -1154,9 +1155,7 @@ function ProvisorioPage() {
       <Numbers />
       <Testimonials />
       <FAQ />
-      <footer className="bg-korum-navy-deep py-10">
-        <SiteSignature />
-      </footer>
+    <SiteFooter />
     </div>
   );
 }
