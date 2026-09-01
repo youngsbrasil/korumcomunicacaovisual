@@ -99,6 +99,10 @@ const HERO_SLIDES = [
   portfolioTotemCarrefour1,
   portfolioFachadaBurgerKing2,
   portfolioTotemCarrefour2,
+  portfolioTotemGulf,
+  portfolioTotemLemon,
+  portfolioTotemPaoAcucar,
+  portfolioTotemSwift,
 ];
 
 function HeroBackgroundSlideshow() {
