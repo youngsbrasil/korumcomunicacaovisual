@@ -60,6 +60,8 @@ import portfolioTotemGulf from "@/assets/totem-gulf.jpg";
 import portfolioTotemLemon from "@/assets/totem-lemon.jpg";
 import portfolioTotemPaoAcucar from "@/assets/totem-pao-acucar.png";
 import portfolioTotemSwift from "@/assets/totem-swift.jpg";
+import heroFachadaExtra1 from "@/assets/hero-fachada-extra-1.jpeg";
+import heroFachadaExtra2 from "@/assets/hero-fachada-extra-2.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -103,6 +105,8 @@ const HERO_SLIDES = [
   portfolioTotemLemon,
   portfolioTotemPaoAcucar,
   portfolioTotemSwift,
+  heroFachadaExtra1,
+  heroFachadaExtra2,
 ];
 
 function HeroBackgroundSlideshow() {
