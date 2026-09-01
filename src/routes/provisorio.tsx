@@ -63,6 +63,7 @@ import portfolioTotemPaoAcucar from "@/assets/totem-pao-acucar.png";
 import portfolioTotemSwift from "@/assets/totem-swift.jpg";
 import heroFachadaExtra1 from "@/assets/hero-fachada-extra-1.jpeg";
 import heroFachadaExtra2 from "@/assets/hero-fachada-extra-2.jpeg";
+import faixaBlueprint from "@/assets/faixa-blueprint.png";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -470,6 +471,20 @@ function BusinessSegments() {
           </a>
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ─── Blueprint Banner Strip ─── */
+function BlueprintBanner() {
+  return (
+    <section className="relative h-40 w-full overflow-hidden sm:h-56 lg:h-64">
+      <img
+        src={faixaBlueprint}
+        alt=""
+        loading="lazy"
+        className="h-full w-full object-cover"
+      />
     </section>
   );
 }
@@ -1125,6 +1140,7 @@ function ProvisorioPage() {
       <SolutionsNav />
       <Solutions />
       <BusinessSegments />
+      <BlueprintBanner />
       <Differentials />
       <Method />
       <PortfolioPreview />
