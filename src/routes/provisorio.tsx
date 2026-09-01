@@ -63,7 +63,6 @@ import portfolioTotemPaoAcucar from "@/assets/totem-pao-acucar.png";
 import portfolioTotemSwift from "@/assets/totem-swift.jpg";
 import heroFachadaExtra1 from "@/assets/hero-fachada-extra-1.jpeg";
 import heroFachadaExtra2 from "@/assets/hero-fachada-extra-2.jpeg";
-import differentialsBg from "@/assets/diferenciais-blueprint-bg.jpeg";
 
 const WHATSAPP =
   "https://wa.me/5511917748504?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20comunica%C3%A7%C3%A3o%20visual.";
@@ -487,32 +486,9 @@ const differentials = [
 
 function Differentials() {
   const ref = useReveal<HTMLDivElement>();
-  const sectionRef = useRef<HTMLElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !bgRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const vh = window.innerHeight || 1;
-      const progress = (vh - rect.top) / (vh + rect.height);
-      const clamped = Math.min(1, Math.max(0, progress));
-      const translateY = (clamped - 0.5) * 80;
-      bgRef.current.style.transform = `translateY(${translateY}px) scale(1.15)`;
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-korum-paper py-24 sm:py-32">
-      <div
-        ref={bgRef}
-        className="absolute inset-0 -top-10 -bottom-10 bg-cover bg-center opacity-[0.85] will-change-transform"
-        style={{ backgroundImage: `url(${differentialsBg})`, transform: "scale(1.15)" }}
-      />
-      <div className="absolute inset-0 bg-korum-paper/40" />
+    <section className="relative overflow-hidden bg-korum-paper py-24 sm:py-32">
       <div ref={ref} className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
           <div className="reveal">
