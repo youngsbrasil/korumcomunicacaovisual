@@ -94,6 +94,44 @@ function renderHeroText(typedText: string) {
   });
 }
 
+const HERO_BG_IMAGES = [
+  portfolioFachadaBurgerKing1,
+  portfolioTotemCarrefour1,
+  portfolioFachadaBurgerKing2,
+  portfolioTotemCarrefour2,
+];
+
+function HeroBackgroundSlideshow() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % HERO_BG_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      {HERO_BG_IMAGES.map((img, i) => (
+        <img
+          key={img}
+          src={img}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-cover transition-all duration-[2000ms] ease-out ${
+            i === index ? "scale-105 opacity-100" : "scale-100 opacity-0"
+          }`}
+          style={{ transitionDelay: i === index ? "0ms" : "0ms" }}
+        />
+      ))}
+      {/* overlay mantém o mesmo tom navy do fundo original */}
+      <div className="absolute inset-0 bg-gradient-to-b from-korum-navy-deep/92 via-korum-navy/85 to-korum-navy-deep/95" />
+      <div className="absolute inset-0 bg-gradient-hero opacity-70" />
+    </div>
+  );
+}
+
 function Hero() {
   const ref = useReveal<HTMLDivElement>();
   const [typedText, setTypedText] = useState("");
@@ -114,9 +152,10 @@ function Hero() {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-hero">
-      <div className="absolute inset-0 bg-grid-pattern opacity-40" />
-      <div className="absolute top-20 right-10 h-72 w-72 rounded-full bg-korum-green/10 blur-3xl" />
-      <div className="absolute bottom-20 left-10 h-96 w-96 rounded-full bg-korum-cyan/10 blur-3xl" />
+      <HeroBackgroundSlideshow />
+      <div className="absolute inset-0 z-[1] bg-grid-pattern opacity-40" />
+      <div className="absolute top-20 right-10 z-[1] h-72 w-72 rounded-full bg-korum-green/10 blur-3xl" />
+      <div className="absolute bottom-20 left-10 z-[1] h-96 w-96 rounded-full bg-korum-cyan/10 blur-3xl" />
 
       <div ref={ref} className="relative z-10 mx-auto max-w-5xl px-4 pt-24 text-center">
         <div className="reveal mb-8 flex justify-center">
