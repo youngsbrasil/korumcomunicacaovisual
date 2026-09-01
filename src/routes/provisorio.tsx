@@ -94,7 +94,7 @@ function renderHeroText(typedText: string) {
   });
 }
 
-const HERO_BG_IMAGES = [
+const HERO_SLIDES = [
   portfolioFachadaBurgerKing1,
   portfolioTotemCarrefour1,
   portfolioFachadaBurgerKing2,
@@ -106,28 +106,32 @@ function HeroBackgroundSlideshow() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % HERO_BG_IMAGES.length);
-    }, 5000);
+      setIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 4500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
-      {HERO_BG_IMAGES.map((img, i) => (
-        <img
-          key={img}
-          src={img}
-          alt=""
-          aria-hidden="true"
-          className={`absolute inset-0 h-full w-full object-cover transition-all duration-[2000ms] ease-out ${
-            i === index ? "scale-105 opacity-100" : "scale-100 opacity-0"
-          }`}
-          style={{ transitionDelay: i === index ? "0ms" : "0ms" }}
-        />
+    <div className="absolute inset-0 z-0">
+      {HERO_SLIDES.map((src, i) => (
+        <div
+          key={src}
+          className="absolute inset-0 transition-opacity duration-[2000ms] ease-out"
+          style={{ opacity: i === index ? 1 : 0 }}
+        >
+          <img
+            src={src}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{
+              animation: i === index ? "heroKenBurns 9s ease-out forwards" : undefined,
+            }}
+          />
+        </div>
       ))}
-      {/* overlay mantém o mesmo tom navy do fundo original */}
-      <div className="absolute inset-0 bg-gradient-to-b from-korum-navy-deep/92 via-korum-navy/85 to-korum-navy-deep/95" />
-      <div className="absolute inset-0 bg-gradient-hero opacity-70" />
+      {/* overlay leve para preservar legibilidade sem esconder as fotos */}
+      <div className="absolute inset-0 bg-gradient-to-b from-korum-navy-deep/70 via-korum-navy/55 to-korum-navy-deep/80" />
+      <div className="absolute inset-0 bg-korum-navy-deep/20" />
     </div>
   );
 }
@@ -151,13 +155,14 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-hero">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-korum-navy-deep">
       <HeroBackgroundSlideshow />
-      <div className="absolute inset-0 z-[1] bg-grid-pattern opacity-40" />
-      <div className="absolute top-20 right-10 z-[1] h-72 w-72 rounded-full bg-korum-green/10 blur-3xl" />
-      <div className="absolute bottom-20 left-10 z-[1] h-96 w-96 rounded-full bg-korum-cyan/10 blur-3xl" />
+      <div className="absolute inset-0 z-[1] bg-gradient-hero opacity-70 mix-blend-multiply" />
+      <div className="absolute inset-0 z-[1] bg-grid-pattern opacity-25" />
+      <div className="absolute top-20 right-10 z-[1] h-72 w-72 rounded-full bg-korum-green/20 blur-3xl" />
+      <div className="absolute bottom-20 left-10 z-[1] h-96 w-96 rounded-full bg-korum-cyan/20 blur-3xl" />
 
-      <div ref={ref} className="relative z-10 mx-auto max-w-5xl px-4 pt-24 text-center">
+      <div ref={ref} className="relative z-10 mx-auto max-w-5xl px-4 pt-24 text-center drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)]">
         <div className="reveal mb-8 flex justify-center">
           <KorumLogo className="h-12 w-auto" />
         </div>
@@ -206,7 +211,7 @@ function Hero() {
         </div>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 z-20 -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-10 left-1/2 z-20 -translate-x-1/2 animate-bounce drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
         <ChevronDown size={24} className="text-korum-paper/40" />
       </div>
     </section>

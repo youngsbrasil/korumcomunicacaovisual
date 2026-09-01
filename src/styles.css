@@ -263,6 +263,15 @@
   animation: pulseGlow 2s ease-in-out infinite;
 }
 
+@keyframes heroKenBurns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.12);
+  }
+}
+
 @keyframes pulseGlow {
   0%,
   100% {
